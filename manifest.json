@@ -1,6 +1,6 @@
 {
   "name": "Bones!",
-  "description": "A barebones dice roller that logs rolls.",
+  "description": "A barebones dice roller that allows for hidden rolls and logging rolls.",
   "version": "1.0",
   "author": "Battle-System",
   "manifest_version": 1,
