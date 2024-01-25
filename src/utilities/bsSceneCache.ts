@@ -69,8 +69,8 @@ class BSCache
         this.theme = "DARK";
         this.roomMetadata = {};
 
-        this.playerDiceTexture = "astral";
-        this.playerDiceColor = "#ff8989";
+        this.playerDiceTexture = "skulls";
+        this.playerDiceColor = "#ff0000";
 
         this.caches = caches;
 
@@ -139,8 +139,8 @@ class BSCache
         if (this.caches.includes(BSCache.ROOMMETA))
         {
             this.roomMetadata = await OBR.room.getMetadata();
-            this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff8989";
-            this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "astral";
+            this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff0000";
+            this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "skulls";
         }
     }
 
