@@ -139,8 +139,8 @@ export class MessageTracker
                 await OBR.modal.open({
                     id: Constants.EXTENSIONDICEWINDOWID,
                     url: messageContainer.rollResult,
-                    height: VIEWPORTHEIGHT - 100,
-                    width: VIEWPORTWIDTH - 100,
+                    height: VIEWPORTHEIGHT - 75,
+                    width: VIEWPORTWIDTH - 75,
                     disablePointerEvents: true,
                     hideBackdrop: true,
                     hidePaper: true

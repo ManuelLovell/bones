@@ -135,12 +135,6 @@ body {
     position: relative;
 }
 
-#bones-window-body-app {
-    margin: 0;
-    height: 100%;
-    width: 100%;
-}
-
 #diceRollingContainer {
     height: 100%;
     width: 100%;

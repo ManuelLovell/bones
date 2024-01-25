@@ -17,14 +17,13 @@ OBR.onReady(async () =>
         theme_customColorset: {
             background: diceColor,
             foreground: Utilities.InvertColor(diceColor),
-            baseScale: 80,
             texture: diceTexture,
-            material: "plastic",
+            material: "wood",
         },
         light_intensity: 1,
         gravity_multiplier: 600,
         baseScale: 100,
-        strength: 3,
+        strength: 2,
         onRollComplete: async (results: any) =>
         {
             const metadata = await OBR.player.getMetadata();
