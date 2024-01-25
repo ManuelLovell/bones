@@ -1,0 +1,268 @@
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: inherit;
+    color: var(--OBR-font);
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+
+    --OBR-font: white;
+    --OBR-font-transparent: rgba(255, 255, 255, 0.493);
+    --OBR-offset-foreground: rgb(230, 230, 238);
+    --OBR-offset-background: rgb(49, 49, 65);
+    --OBR-light-blue: rgb(60, 62, 75);
+    --OBR-light-blue-transparent: rgb(60, 62, 75, 0.5);
+    --OBR-dark-blue: rgb(30, 34, 49);
+    --OBR-dark-blue-transparent: rgba(30, 34, 49, 0.5);
+    --OBR-Purple-Select: rgb(187, 153, 255);
+    --OBR-Purple-Select-transparent: rgb(187, 153, 255, 0.5);
+    --OBR-soft-outline: rgb(65, 65, 65);
+
+    --invert: none;
+    --invert-click: invert(52%) sepia(81%) saturate(5333%) hue-rotate(331deg) brightness(90%) contrast(88%);
+    --slider-color: #ccc;
+    --tooltip-background: none;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --OBR-font: rgb(49, 49, 49);
+        --OBR-soft-outline: rgb(196, 196, 196);
+        --OBR-offset-fore: rgb(44, 44, 46);
+        --OBR-offset-back: rgb(210, 210, 223);
+        --OBR-dark-blue: rgb(209, 210, 217);
+        --OBR-light-blue: rgb(231, 233, 238);
+
+        --invert: invert(.65);
+        --invert-click: none;
+        --tooltip-background: rgb(161, 161, 161);
+    }
+}
+
+.header {
+    text-align: center;
+    font-weight: bold;
+}
+
+#rollLog {
+    list-style: none;
+    margin: 0;
+    padding: 5px;
+    font-size: smaller;
+}
+
+#rollContainer {
+    background-color: var(--OBR-dark-blue-transparent);
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    height: 10em;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+/* COLORIS */
+.colorisContainer {
+    width: 100%;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#diceColoris {
+    cursor: pointer;
+    width: 100%;
+    height: 2em;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    box-sizing: border-box;
+}
+
+.full .clr-field button {
+    border: 1px solid #ccc;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+
+/* COLORIS */
+
+/* SELECT */
+select {
+    /* Reset Select */
+    appearance: none;
+    outline: 10px var(--OBR-Purple-Select);
+    box-shadow: none;
+    /* Personalize */
+    flex: 1;
+    padding: 0 1em;
+    color: #fff;
+    background-color: var(--OBR-dark-blue);
+    background-image: none;
+    cursor: pointer;
+}
+
+/* Remove IE arrow */
+select::-ms-expand {
+    display: none;
+}
+
+/* Custom Select wrapper */
+.select {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 3em;
+    border-radius: .25em;
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+/* Arrow */
+.select::after {
+    content: '\25BC';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1em;
+    background-color: var(--OBR-offset-background);
+    transition: .25s all ease;
+    pointer-events: none;
+}
+
+/* Transition */
+.select:hover::after {
+    color: var(--OBR-Purple-Select);
+}
+
+/* SELECT */
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+    width: 20px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--dice-color);
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #204472;
+}
+
+.Icon {
+    padding: 0px 10px;
+    vertical-align: text-bottom;
+    height: 25px;
+    width: 25px;
+    filter: var(--invert);
+}
+
+.clickable {
+    filter: var(--invert);
+}
+
+.clickable:active {
+    filter: var(--invert-click);
+    transform: scale(1.5);
+}
+
+html {
+    padding: 2px;
+}
+
+#bannerText {
+    width: 95%;
+    font-size: 18px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+    font-style: italic;
+    background: linear-gradient(to right, transparent 0%, var(--OBR-Purple-Select) 50%, transparent 100%);
+}
+
+@keyframes glowingText {
+    0% {
+        text-shadow: 0 0 1px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.3), 0 0 20px rgba(0, 188, 212, 0.3), 0 0 30px rgba(0, 188, 212, 0.3), 0 0 40px rgba(0, 188, 212, 0.3), 0 0 55px rgba(0, 188, 212, 0.3);
+    }
+
+    100% {
+        text-shadow: 0 0 1px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 235, 59, 0.3), 0 0 30px rgba(255, 235, 59, 0.3), 0 0 40px rgba(255, 235, 59, 0.3), 0 0 55px rgba(255, 235, 59, 0.3);
+    }
+}
+
+@keyframes glowingText {
+    0% {
+        text-shadow: 0 0 1px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.3), 0 0 20px rgba(0, 188, 212, 0.3), 0 0 30px rgba(0, 188, 212, 0.3), 0 0 40px rgba(0, 188, 212, 0.3), 0 0 55px rgba(0, 188, 212, 0.3);
+    }
+
+    100% {
+        text-shadow: 0 0 1px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 235, 59, 0.3), 0 0 30px rgba(255, 235, 59, 0.3), 0 0 40px rgba(255, 235, 59, 0.3), 0 0 55px rgba(255, 235, 59, 0.3);
+    }
+}
+
+.imageIcon {
+    width: 20px;
+    height: 20px;
+    margin-left: 6px;
+}
+
+.clickable {
+    filter: var(--invert);
+    background-color: transparent !important;
+    border-style: none !important;
+    vertical-align: text-bottom;
+    height: 20px;
+    width: 20px;
+    margin-right: 4px;
+    margin-left: 10px;
+}
+
+@keyframes battle-system-glow {
+    0% {
+        box-shadow: 0 0 2px 0px red;
+    }
+
+    50% {
+        box-shadow: 0 0 8px 4px red;
+    }
+
+    100% {
+        box-shadow: 0 0 2px 0px red;
+    }
+}
+
+@keyframes shine {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+.whats-new-shine {
+    animation: battle-system-glow 1.5s infinite;
+    border-radius: 50%;
+}
