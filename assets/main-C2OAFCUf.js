@@ -1,4 +1,4 @@
-import{C as q,O as S}from"./bsConstants-E4N5t5Rc.js";import{B as F}from"./bsSceneCache-qAmaSuWl.js";const x=(()=>{/*!
+import{C as q,O as S}from"./bsConstants-E4N5t5Rc.js";import{B as F}from"./bsSceneCache-F1A59X9s.js";const x=(()=>{/*!
 * Copyright (c) 2021-2023 Momo Bassit.
 * Licensed under the MIT License (MIT)
 * https://github.com/mdbassit/Coloris
