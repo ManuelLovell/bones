@@ -36,8 +36,8 @@ OBR.onReady(async () =>
             scale: 4,
             enableShadows: true,
             shadowTransparency: .5,
-            theme: diceTexture,
-            themeColor: diceColor
+            theme: diceTexture ?? "default",
+            themeColor: diceColor ?? "#ff0000"
         }
     );
     Dice.onRollComplete = async (results) => 
@@ -134,8 +134,7 @@ OBR.onReady(async () =>
 
                     } catch (error)
                     {
-                        Dice.updateConfig({ theme: "default", themeColor: "#ff0000" });
-                        Dice.show().roll(DRP.parseNotation(messageContainer.notation));
+                        Dice.show().roll(DRP.parseNotation(messageContainer.notation), { theme: "default", themeColor: "#ff0000" });
                         // await OBR.notification.show("Unable to display Dice in your browser:"+ error, "ERROR");
                         // await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
                         // await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
