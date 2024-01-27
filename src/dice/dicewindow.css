@@ -50,6 +50,15 @@
     }
 }
 
+.fade-out {
+    opacity: 1;
+    transition: opacity .5s ease-in-out;
+}
+
+.hidden {
+    opacity: 0;
+}
+
 body {
     display: block;
     width: 100%;

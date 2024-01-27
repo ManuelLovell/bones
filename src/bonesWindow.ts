@@ -69,11 +69,18 @@ OBR.onReady(async () =>
         const finalMessage = `You rolled a ${finalResults.value}!`;
         await OBR.notification.show(finalMessage, "DEFAULT");
         clearTimeout(AUTOTIMER);
+
+        setTimeout(async () =>
+        {
+            Constants.BONESWINDOW.classList.add('hidden');
+        }, 1500);
+
         setTimeout(async () =>
         {
             await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
             await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
-        }, 1000);
+            Constants.BONESWINDOW.classList.remove('hidden');
+        }, 2000);
     }
 
     ///StartUp
