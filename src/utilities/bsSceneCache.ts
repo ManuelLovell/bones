@@ -300,6 +300,7 @@ class BSCache
 
     public async OnPlayerChange(player: Player)
     {
+        await MESSAGES.ShowBonesRoll(player.metadata);
         await MESSAGES.LogBonesRoll(player.metadata);
     }
 

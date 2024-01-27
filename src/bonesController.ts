@@ -172,13 +172,13 @@ OBR.onReady(async () =>
 
                 const metadata: Metadata = {};
                 const now = new Date().toISOString();
-                metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`]
+                metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] // metadata[`com.battle-system.bones/metadata_bonesroll`]
                     = {
-                        notation: rollEquation,
-                        created: now,
-                        senderName: userName,
-                        senderId: userId,
-                        viewers: viewedBy
+                        notation: rollEquation, // "2d20kh1"
+                        created: now, // new Date().toISOString()
+                        senderName: userName, // Name to display for Roll
+                        senderId: userId, // PlayerId | Self-Tracking-Number
+                        viewers: viewedBy // "ALL" | "GM" | "SELF"
                     } as IBonesRoll;
 
                 await OBR.player.setMetadata(metadata);

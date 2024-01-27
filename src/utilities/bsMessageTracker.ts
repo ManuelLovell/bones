@@ -34,6 +34,39 @@ export class MessageTracker
             return false;
         }
     }
+    /// Step 2. Send to the window.
+    public async ShowBonesRoll(metadata: Metadata)
+    {
+        if (metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] != undefined)
+        {
+            const bonesLog = metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesLog;
+
+            if (!this.IsThisOld(bonesLog.created, bonesLog.senderId, "ROLL"))
+            {
+
+                const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
+                const VIEWPORTWIDTH = await OBR.viewport.getWidth();
+                await OBR.popover.open({
+                    id: Constants.EXTENSIONDICEWINDOWID,
+                    url: '/dicewindow.html',
+                    height: VIEWPORTHEIGHT - 50,
+                    width: VIEWPORTWIDTH - 50,
+                    anchorPosition: { top: 25, left: 25 },
+                    anchorReference: "POSITION",
+                    anchorOrigin: {
+                        vertical: "TOP",
+                        horizontal: "LEFT",
+                    },
+                    transformOrigin: {
+                        vertical: "TOP",
+                        horizontal: "LEFT",
+                    },
+                    disableClickAway: true,
+                    hidePaper: true
+                });
+            }
+        }
+    }
 
     /// Step 3. This logs the roll to the window after the roll has completed.
     public async LogBonesRoll(metadata: Metadata)

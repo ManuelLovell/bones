@@ -12,14 +12,17 @@ interface IBonesRoll
     notation: string;
     senderName?: string,
     senderColor?: string,
+    senderId?: string,
     viewers?: "SELF" | "ALL" | "GM";
 
-    // Outside-Extension Metadata ID: "com.battle-system.friends"
-    // metadata[`com.battle-system.friends/metadata_diceroll`] = {
-    //   created: now,
-    //   notation: "2d10",
-    //   sender: "Buddy!!"
-    //   viewers: "GM"
+    // HOW TO ROLL THE BONES, HAHAHAHAHAHA.
+    // metadata[`com.battle-system.bones/metadata_bonesroll`]
+    // = {
+    //     notation: rollEquation,  // "2d20kh1"
+    //     created: now,            // new Date().toISOString()
+    //     senderName: userName,    // Name to display for Roll
+    //     senderId: userId,        // PlayerId | Self-Tracking-Number
+    //     viewers: viewedBy        // "ALL" | "GM" | "SELF"
     // };
 }
 

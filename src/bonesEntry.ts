@@ -31,7 +31,6 @@ OBR.onReady(async () =>
     whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
 
     await OpenDiceController();
-    await OpenDiceBoxWindow();
     // Check if the button needs repositioning every 2 seconds.
     setInterval(handleViewportdChange, 2000);
 });
@@ -64,20 +63,6 @@ async function OpenDiceController()
     }
 }
 
-async function OpenDiceBoxWindow()
-{
-    try
-    {
-        await OpenDiceBoxWindowInner();
-    } catch (error)
-    {
-        setTimeout(async () =>
-        {
-            await OpenDiceBoxWindowInner();
-        }, 2000);
-    }
-}
-
 async function OpenDiceControllerInner()
 {
     VIEWPORTHEIGHT = await OBR.viewport.getHeight();
@@ -98,28 +83,6 @@ async function OpenDiceControllerInner()
         transformOrigin: {
             vertical: "BOTTOM",
             horizontal: "RIGHT",
-        },
-        disableClickAway: true,
-        hidePaper: true
-    });
-}
-
-async function OpenDiceBoxWindowInner()
-{
-    await OBR.popover.open({
-        id: Constants.EXTENSIONDICEWINDOWID,
-        url: '/dicewindow.html',
-        height: 0,
-        width: 0,
-        anchorPosition: { top: 50, left: 50 },
-        anchorReference: "POSITION",
-        anchorOrigin: {
-            vertical: "TOP",
-            horizontal: "LEFT",
-        },
-        transformOrigin: {
-            vertical: "TOP",
-            horizontal: "LEFT",
         },
         disableClickAway: true,
         hidePaper: true

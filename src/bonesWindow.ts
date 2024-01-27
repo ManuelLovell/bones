@@ -1,23 +1,24 @@
 import DiceBox from '@3d-dice/dice-box';
 import DiceParser from "@3d-dice/dice-parser-interface";
 import { Constants } from './utilities/bsConstants';
-import { MESSAGES } from './utilities/bsMessageTracker';
 import OBR from '@owlbear-rodeo/sdk';
 import './dice/dicewindow.css'
 import { GetResults } from './dice/bsDiceResults';
 
 OBR.onReady(async () =>
 {
-    let roomMetadata = await OBR.room.getMetadata();
-    let defaultId = await OBR.player.getId();
-    let defaultName = await OBR.player.getName();
-    let defaultColor = await OBR.player.getColor();
-    let diceColor = roomMetadata[Constants.DICECOLORSETTING + defaultId] as string;
-    let diceTexture = roomMetadata[Constants.DICETEXTURESETTING + defaultId] as string;
+    const roomMetadata = await OBR.room.getMetadata();
+    const playerMetadata = await OBR.player.getMetadata();
+    const defaultId = await OBR.player.getId();
+    const defaultName = await OBR.player.getName();
+    const defaultColor = await OBR.player.getColor();
+    const diceColor = roomMetadata[Constants.DICECOLORSETTING + defaultId] as string;
+    const diceTexture = roomMetadata[Constants.DICETEXTURESETTING + defaultId] as string;
+
     let defaultViewers: "GM" | "SELF" | "ALL" = "SELF";
-    let ERROR = false;
     let AUTOTIMER;
 
+    let customId = "";
     let customName = "";
     let customColor = "";
     let customViewers: "GM" | "SELF" | "ALL" = "ALL";
@@ -40,6 +41,7 @@ OBR.onReady(async () =>
             themeColor: diceColor ?? "#ff0000"
         }
     );
+
     Dice.onRollComplete = async (results) => 
     {
         const rerolls = DRP.handleRerolls(results);
@@ -60,7 +62,7 @@ OBR.onReady(async () =>
             created: now,
             rollHtml: htmlResults,
             senderColor: customColor,
-            senderId: defaultId,
+            senderId: customId,
             senderName: customName,
             viewers: customViewers
         };
@@ -77,78 +79,45 @@ OBR.onReady(async () =>
 
         setTimeout(async () =>
         {
-            await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
-            await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
-            Constants.BONESWINDOW.classList.remove('hidden');
+            await OBR.popover.close(Constants.EXTENSIONDICEWINDOWID);
         }, 2000);
     }
 
     ///StartUp
     try
     {
-        Dice.init();
+        Dice.init().then(() =>
+        {
+            const messageContainer = playerMetadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
+            customName = messageContainer.senderName ?? defaultName;
+            customViewers = messageContainer.viewers ?? defaultViewers;
+            customColor = messageContainer.senderColor ?? defaultColor;
+            customId = messageContainer.senderId ?? defaultId;
+
+            try
+            {
+                Dice.hide().clear();
+                Dice.show().roll(DRP.parseNotation(messageContainer.notation));
+
+                SetAutoTimeout();
+
+            } catch (error)
+            {
+                Dice.show().roll(DRP.parseNotation(messageContainer.notation), { theme: "default", themeColor: "#ff0000" });
+                SetAutoTimeout();
+            }
+        });
+
     } catch (error)
     {
         await OBR.notification.show("Unable to initialize 3D-Dice", "ERROR");
-        ERROR = true;
     }
 
-    OBR.room.onMetadataChange(metadata =>
+    function SetAutoTimeout()
     {
-        diceColor = metadata[Constants.DICECOLORSETTING + defaultId] as string;
-        diceTexture = metadata[Constants.DICETEXTURESETTING + defaultId] as string;
-
-        Dice.updateConfig({ theme: diceTexture, themeColor: diceColor });
-    });
-    OBR.player.onChange(async (self) =>
-    {
-        defaultColor = self.color;
-        defaultName = self.name;
-        defaultId = self.id;
-
-        if (ERROR)
+        AUTOTIMER = setTimeout(async () =>
         {
-            await OBR.notification.show("Unable to display Dice in your browser", "ERROR");
-        }
-        else
-        {
-            if (self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] != undefined)
-            {
-                const messageContainer = self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
-
-                if (!MESSAGES.IsThisOld(messageContainer.created, defaultId, "DEFAULT"))
-                {
-                    customName = messageContainer.senderName ?? defaultName;
-                    customViewers = messageContainer.viewers ?? defaultViewers;
-                    customColor = messageContainer.senderColor ?? defaultColor;
-
-                    const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
-                    const VIEWPORTWIDTH = await OBR.viewport.getWidth();
-
-                    await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, VIEWPORTHEIGHT - 50);
-                    await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, VIEWPORTWIDTH - 50);
-
-                    try
-                    {
-                        Dice.hide().clear();
-                        Dice.show().roll(DRP.parseNotation(messageContainer.notation));
-
-                        AUTOTIMER = setTimeout(async () =>
-                        {
-                            await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
-                            await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
-                        }, 6000);
-
-                    } catch (error)
-                    {
-                        Dice.show().roll(DRP.parseNotation(messageContainer.notation), { theme: "default", themeColor: "#ff0000" });
-                        // await OBR.notification.show("Unable to display Dice in your browser:"+ error, "ERROR");
-                        // await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
-                        // await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
-                        // ERROR = true;
-                    }
-                }
-            }
-        }
-    });
+            await OBR.popover.close(Constants.EXTENSIONDICEWINDOWID);
+        }, 6000);
+    }
 });
