@@ -24,14 +24,14 @@ OBR.onReady(async () =>
     await BSCACHE.InitializeCache();
     BSCACHE.SetupHandlers();
 
-    await OpenDiceController();
-    await OpenDiceBoxWindow();
     CreateColorSelect();
     CreateTextureSelect();
 
     const whatsNewContainer = document.getElementById("whatsNew")!;
     whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
 
+    await OpenDiceController();
+    await OpenDiceBoxWindow();
     // Check if the button needs repositioning every 2 seconds.
     setInterval(handleViewportdChange, 2000);
 });

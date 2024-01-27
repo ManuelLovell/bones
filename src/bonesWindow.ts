@@ -134,10 +134,12 @@ OBR.onReady(async () =>
 
                     } catch (error)
                     {
-                        await OBR.notification.show("Unable to display Dice in your browser:"+ error, "ERROR");
-                        await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
-                        await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
-                        ERROR = true;
+                        Dice.updateConfig({ theme: "default", themeColor: "#ff0000" });
+                        Dice.show().roll(DRP.parseNotation(messageContainer.notation));
+                        // await OBR.notification.show("Unable to display Dice in your browser:"+ error, "ERROR");
+                        // await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
+                        // await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
+                        // ERROR = true;
                     }
                 }
             }
