@@ -2,12 +2,13 @@ import OBR from '@owlbear-rodeo/sdk';
 import { BSCACHE } from './utilities/bsSceneCache';
 import { Constants } from './utilities/bsConstants';
 import Coloris from '@melloware/coloris';
+import * as Utilities from './utilities/bsUtilities';
 import "@melloware/coloris/dist/coloris.css";
 import './style.css'
 
-Constants.BONESENTRY.innerHTML = 
-`
-    <div class="header">Dice Color</div>
+Constants.BONESENTRY.innerHTML =
+    `
+    <div class="header">Dice Color</div><div id="whatsNew"></div>
     <div id="colorisContainer" class='coloris-container full'></div>
     <div class="header">Dice Choice</div>
     <div id="selectContainer" class="select"></div>
@@ -24,8 +25,12 @@ OBR.onReady(async () =>
     BSCACHE.SetupHandlers();
 
     await OpenDiceController();
+    await OpenDiceBoxWindow();
     CreateColorSelect();
     CreateTextureSelect();
+
+    const whatsNewContainer = document.getElementById("whatsNew")!;
+    whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
 
     // Check if the button needs repositioning every 2 seconds.
     setInterval(handleViewportdChange, 2000);
@@ -59,11 +64,26 @@ async function OpenDiceController()
     }
 }
 
+async function OpenDiceBoxWindow()
+{
+    try
+    {
+        await OpenDiceBoxWindowInner();
+    } catch (error)
+    {
+        setTimeout(async () =>
+        {
+            await OpenDiceBoxWindowInner();
+        }, 2000);
+    }
+}
+
 async function OpenDiceControllerInner()
 {
     VIEWPORTHEIGHT = await OBR.viewport.getHeight();
     VIEWPORTWIDTH = await OBR.viewport.getWidth();
 
+    await OBR.popover.close(Constants.EXTENSIONDICECONTROLLERID);
     await OBR.popover.open({
         id: Constants.EXTENSIONDICECONTROLLERID,
         url: '/dicecontroller.html',
@@ -78,6 +98,28 @@ async function OpenDiceControllerInner()
         transformOrigin: {
             vertical: "BOTTOM",
             horizontal: "RIGHT",
+        },
+        disableClickAway: true,
+        hidePaper: true
+    });
+}
+
+async function OpenDiceBoxWindowInner()
+{
+    await OBR.popover.open({
+        id: Constants.EXTENSIONDICEWINDOWID,
+        url: '/dicewindow.html',
+        height: 0,
+        width: 0,
+        anchorPosition: { top: 50, left: 50 },
+        anchorReference: "POSITION",
+        anchorOrigin: {
+            vertical: "TOP",
+            horizontal: "LEFT",
+        },
+        transformOrigin: {
+            vertical: "TOP",
+            horizontal: "LEFT",
         },
         disableClickAway: true,
         hidePaper: true
@@ -134,26 +176,15 @@ function CreateTextureSelect()
     selector.id = "textureSelect";
 
     const textures = [
-        { text: "Astral", value: "astral" },
-        { text: "Bronze", value: "bronze03" },
-        { text: "Cheetah", value: "cheetah" },
-        { text: "Cloudy", value: "cloudy" },
-        { text: "Dragon", value: "dragon" },
-        { text: "Feather", value: "feather" },
-        { text: "Fire", value: "fire" },
-        { text: "Glitter", value: "glitter" },
-        { text: "Ice", value: "ice" },
-        { text: "Marble", value: "marble" },
-        { text: "Metal", value: "metal" },
-        { text: "Skulls", value: "skulls" },
-        { text: "Stained Glass", value: "stainedglass" },
-        { text: "Stars", value: "stars" },
-        { text: "Stone", value: "stone" },
-        { text: "Tiger", value: "tiger" },
-        { text: "Water", value: "water" },
-        { text: "Wood", value: "wood" }
+        { text: "Default", value: "default" },
+        { text: "D.o.R", value: "diceOfRolling" },
+        { text: "Gemstone", value: "gemstone" },
+        { text: "Marble", value: "gemstoneMarble" },
+        { text: "Rocky", value: "rock" },
+        { text: "Rusty", value: "rust" },
+        { text: "Smooth", value: "smooth" },
+        { text: "Wood", value: "wooden" },
     ];
-
 
     textures.forEach((texture) =>
     {

@@ -1,5 +1,46 @@
-import { Item, Image, Theme } from "@owlbear-rodeo/sdk";
+import OBR, { Item, Image, Theme } from "@owlbear-rodeo/sdk";
 import { BSCACHE } from "./bsSceneCache";
+import { Constants } from "./bsConstants";
+
+
+export function GetWhatsNewButton()
+{
+    const newImgElement = document.createElement('img');
+    newImgElement.id = "whatsNewButton";
+    newImgElement.style.cursor = "pointer";
+    newImgElement.setAttribute('class', 'icon');
+    newImgElement.classList.add('clickable');
+    newImgElement.setAttribute('title', 'Whats New?');
+    newImgElement.setAttribute('src', '/info.svg');
+    newImgElement.onclick = async function ()
+    {
+        try
+        {
+            localStorage.setItem(Constants.VERSION, "true");
+            newImgElement.classList.remove('whats-new-shine');
+        } catch (error)
+        {
+            // Oh well.
+        }
+        await OBR.modal.open({
+            id: Constants.EXTENSIONWHATSNEW,
+            url: `/bsWhatsNew.html`,
+            height: 500,
+            width: 350,
+        });
+    };
+
+    try
+    {
+        const glow = localStorage.getItem(Constants.VERSION);
+        if (glow !== "true") newImgElement.classList.add('whats-new-shine');
+    } catch (error)
+    {
+        // Oh well.
+    }
+
+    return newImgElement;
+}
 
 export function GetGUID(): string
 {

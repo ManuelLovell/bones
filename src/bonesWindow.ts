@@ -1,57 +1,112 @@
-import DiceBox from '@3d-dice/dice-box-threejs';
+import DiceBox from '@3d-dice/dice-box';
+import DiceParser from "@3d-dice/dice-parser-interface";
 import { Constants } from './utilities/bsConstants';
-import * as Utilities from './utilities/bsUtilities';
+import { MESSAGES } from './utilities/bsMessageTracker';
 import OBR from '@owlbear-rodeo/sdk';
 import './dice/dicewindow.css'
+import { GetResults } from './dice/bsDiceResults';
 
 OBR.onReady(async () =>
 {
-    // FULL SCREEN WINDOW FOR SELF
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const preroll = decodeURIComponent(urlParams.get('preroll')!);
-    const diceTexture = decodeURIComponent(urlParams.get('texture')!);
-    const diceColor = decodeURIComponent(urlParams.get('color')!);
+    let roomMetadata = await OBR.room.getMetadata();
+    let defaultId = await OBR.player.getId();
+    let defaultName = await OBR.player.getName();
+    let defaultColor = await OBR.player.getColor();
+    let diceColor = roomMetadata[Constants.DICECOLORSETTING + defaultId] as string;
+    let diceTexture = roomMetadata[Constants.DICETEXTURESETTING + defaultId] as string;
+    let defaultViewers: "GM" | "SELF" | "ALL" = "SELF";
 
-    const Box = new DiceBox("#bones-window-body-app", {
-        theme_customColorset: {
-            background: diceColor,
-            foreground: Utilities.InvertColor(diceColor),
-            texture: diceTexture,
-            material: "wood",
-        },
-        light_intensity: 1,
-        gravity_multiplier: 600,
-        baseScale: 100,
-        strength: 2,
-        onRollComplete: async (results: any) =>
+    let customName = "";
+    let customColor = "";
+    let customViewers: "GM" | "SELF" | "ALL" = "ALL";
+
+    const DRP = new DiceParser();
+    const Dice = new DiceBox(
+        "#bones-window-body-app", // target DOM element to inject the canvas for rendering
         {
-            const metadata = await OBR.player.getMetadata();
-            // Get Data from Throw Roll and Transfer to Log Roll
-            const messageContainer = metadata[`${Constants.EXTENSIONID}/metadata_throwroll`] as IBonesLog;
-            await OBR.player.setMetadata({ [`${Constants.EXTENSIONID}/metadata_logroll`]: messageContainer });
+            id: "dice-canvas", // canvas element id
+            assetPath: "/assets/",
+            startingHeight: 8,
+            throwForce: 10,
+            spinForce: 5,
+            gravity: 2,
+            lightIntensity: 1,
+            scale: 4,
+            enableShadows: true,
+            shadowTransparency: .5,
+            theme: diceTexture,
+            themeColor: diceColor
+        }
+    );
+    Dice.onRollComplete = async (results) => 
+    {
+        const rerolls = DRP.handleRerolls(results);
+        if (rerolls.length)
+        {
+            rerolls.forEach((roll) => Dice.add(roll, roll.groupId));
+            return rerolls;
+        }
 
-            const message = `You rolled a ${results.total}!`;
-            await OBR.notification.show(message, "DEFAULT");
-            setTimeout(async () =>
+        // if no rerolls needed then parse the final results
+        const finalResults = DRP.parseFinalResults(results);
+
+        /// Use modified Result Parser to just get HTML back for Notifier
+        const htmlResults = GetResults(finalResults);
+
+        const now = new Date().toISOString();
+        const bonesLogged: IBonesLog = {
+            created: now,
+            rollHtml: htmlResults,
+            senderColor: customColor,
+            senderId: defaultId,
+            senderName: customName,
+            viewers: customViewers
+        };
+        await OBR.player.setMetadata({ [`${Constants.EXTENSIONID}/metadata_logroll`]: bonesLogged });
+
+        const finalMessage = `You rolled a ${finalResults.value}!`;
+        await OBR.notification.show(finalMessage, "DEFAULT");
+
+        setTimeout(async () =>
+        {
+            await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
+            await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
+        }, 1000);
+    }
+    Dice.init();
+
+    OBR.room.onMetadataChange(metadata =>
+    {
+        diceColor = metadata[Constants.DICECOLORSETTING + defaultId] as string;
+        diceTexture = metadata[Constants.DICETEXTURESETTING + defaultId] as string;
+
+        Dice.updateConfig({ theme: diceTexture, themeColor: diceColor });
+    });
+    OBR.player.onChange(async (self) =>
+    {
+        defaultColor = self.color;
+        defaultName = self.name;
+        defaultId = self.id;
+
+        if (self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] != undefined)
+        {
+            const messageContainer = self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
+
+            if (!MESSAGES.IsThisOld(messageContainer.created, defaultId, "DEFAULT"))
             {
-                await OBR.modal.close(Constants.EXTENSIONDICEWINDOWID);
-            }, 1000);
+                customName = messageContainer.senderName ?? defaultName;
+                customViewers = messageContainer.viewers ?? defaultViewers;
+                customColor = messageContainer.senderColor ?? defaultColor;
+
+                const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
+                const VIEWPORTWIDTH = await OBR.viewport.getWidth();
+
+                await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, VIEWPORTHEIGHT - 50);
+                await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, VIEWPORTWIDTH - 50);
+
+                Dice.hide().clear();
+                Dice.show().roll(DRP.parseNotation(messageContainer.notation));
+            }
         }
     });
-
-    Box.initialize()
-        .then(() =>
-        {
-            setTimeout(() =>
-            {
-                Box.roll(preroll.replace(/\_/g, '+'));
-            }, 500);
-        })
-        .catch((e: any) => console.error(e));
-
-    setTimeout(async () =>
-    {
-        await OBR.modal.close(Constants.EXTENSIONDICEWINDOWID);
-    }, 5000);
 });

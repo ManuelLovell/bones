@@ -5,9 +5,10 @@ import './dice/dicecontroller.css'
 OBR.onReady(async () =>
 {
     const diceOpenImg = '/dice-twenty.svg';
-    const diceCloseImg = '/cancel.svg';
+    const diceCloseImg = '/cancel-dice.svg';
     const diceGoImg = '/go.svg';
-    const userId = await OBR.player.getName();
+    const userName = await OBR.player.getName();
+    const userId = await OBR.player.getId();
 
     let rollDict: { [key: string]: number } = {};
 
@@ -164,7 +165,7 @@ OBR.onReady(async () =>
                 const rollEquation = rolls.join('+');
                 const selfview = selfButton.dataset.active;
                 const gmview = gmButton.dataset.active;
-                
+
                 let viewedBy = "ALL";
                 if (selfview === "TRUE") viewedBy = "SELF";
                 if (gmview === "TRUE") viewedBy = "GM";
@@ -175,7 +176,8 @@ OBR.onReady(async () =>
                     = {
                         notation: rollEquation,
                         created: now,
-                        sender: userId,
+                        senderName: userName,
+                        senderId: userId,
                         viewers: viewedBy
                     } as IBonesRoll;
 

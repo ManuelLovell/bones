@@ -94,13 +94,11 @@ class BSCache
             this.playerColor = await OBR.player.getColor();
             this.playerMetadata = await OBR.player.getMetadata();
             this.playerRole = await OBR.player.getRole();
-            
+
             const boneData = this.playerMetadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
-            if (boneData) MESSAGES.IsThisOld(boneData.created, boneData.sender, "DEFAULT");
-            const logData = this.playerMetadata[`${Constants.EXTENSIONID}/metadata_throwroll`] as IBonesLog
-            if (logData) MESSAGES.IsThisOld(logData.created, logData.sender, "LOG");
-            const throwData = this.playerMetadata[`${Constants.EXTENSIONID}/metadata_logroll`] as IBonesLog;
-            if (throwData) MESSAGES.IsThisOld(throwData.created, throwData.sender, "THROW");
+            if (boneData) MESSAGES.IsThisOld(boneData.created, boneData.senderName!, "DEFAULT");
+            const logData = this.playerMetadata[`${Constants.EXTENSIONID}/metadata_logroll`] as IBonesLog;
+            if (logData) MESSAGES.IsThisOld(logData.created, logData.senderId, "LOG");
         }
 
         if (this.caches.includes(BSCache.PARTY))
@@ -109,11 +107,9 @@ class BSCache
             for (const player of this.party)
             {
                 const boneData = player.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
-                if (boneData) MESSAGES.IsThisOld(boneData.created, boneData.sender, "DEFAULT");
-                const logData = player.metadata[`${Constants.EXTENSIONID}/metadata_throwroll`] as IBonesLog
-                if (logData) MESSAGES.IsThisOld(logData.created, logData.sender, "LOG");
-                const throwData = player.metadata[`${Constants.EXTENSIONID}/metadata_logroll`] as IBonesLog;
-                if (throwData) MESSAGES.IsThisOld(throwData.created, throwData.sender, "THROW");
+                if (boneData) MESSAGES.IsThisOld(boneData.created, boneData.senderName!, "DEFAULT");
+                const logData = player.metadata[`${Constants.EXTENSIONID}/metadata_logroll`] as IBonesLog;
+                if (logData) MESSAGES.IsThisOld(logData.created, logData.senderId, "LOG");
             }
         }
 
@@ -140,7 +136,21 @@ class BSCache
         {
             this.roomMetadata = await OBR.room.getMetadata();
             this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff0000";
-            this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "skulls";
+            this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "default";
+            const defaultTextureSafetyCheck = [
+                "default",
+                "diceOfRolling",
+                "gemstone",
+                "gemstoneMarble",
+                "rock",
+                "rust",
+                "smooth",
+                "wooden"
+            ];
+            if (!defaultTextureSafetyCheck.includes(this.playerDiceTexture))
+            {
+                this.playerDiceTexture = "default";
+            }
         }
     }
 
@@ -290,7 +300,6 @@ class BSCache
 
     public async OnPlayerChange(player: Player)
     {
-        await MESSAGES.VerifyMetadataRoll(player.metadata);
         await MESSAGES.LogBonesRoll(player.metadata);
     }
 

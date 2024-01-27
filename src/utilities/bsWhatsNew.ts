@@ -1,16 +1,18 @@
 import OBR from "@owlbear-rodeo/sdk";
-import '/src/css/new-style.css'
+import './bsWhatsNewStyle.css'
 import { Constants } from "./bsConstants";
 
 
-const whatsnew = document.querySelector<HTMLDivElement>('#clash-whatsnew')!;
-const footer = document.querySelector<HTMLElement>('#clash-whatsnew-notes')!;
+const whatsnew = document.querySelector<HTMLDivElement>('#bs-whatsnew')!;
+const footer = document.querySelector<HTMLElement>('#bs-whatsnew-notes')!;
 
 whatsnew.innerHTML = `
   <div id="newsContainer">
-    <h1>Bones! 1/21</h1>
+    <h1>Bones! 1/26</h1>
+    </br> So, some things shuffled around. I decided to use the old dice-box package that Rumble started with for this one. It seems to have better performance in areas, though loses in some other areas.
+    </br> There are less dice themes (by default), but they seem pretty easy to make. So - in the future - probably will.
     </br>
-    </br>
+    </br> Also took a layer off the 'hidden' dice rolls. Now it lets people know you rolled (As was suggested by a Discord member), but doesn't tell them the results.
     </br>
   </div>
 `;

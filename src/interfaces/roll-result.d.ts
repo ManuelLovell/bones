@@ -10,9 +10,10 @@ interface IBonesRoll
 {
     created: string;
     notation: string;
-    sender: string;
-    viewers: "SELF" | "ALL" | "GM";
-    
+    senderName?: string,
+    senderColor?: string,
+    viewers?: "SELF" | "ALL" | "GM";
+
     // Outside-Extension Metadata ID: "com.battle-system.friends"
     // metadata[`com.battle-system.friends/metadata_diceroll`] = {
     //   created: now,
@@ -25,24 +26,11 @@ interface IBonesRoll
 interface IBonesLog
 {
     created: string; // new Date().toISOString();
-    sender: string; // Sender Name
+    senderName: string; // Sender Name
     senderId: string; // Sender OBR Id
+    senderColor: string; // Sender OBR Color
     viewers: "SELF" | "ALL" | "GM";
-    critical?: boolean; // critical hit css
-    rollResult: any; // result of a roll to broadcast
-    rollMessage: string;
-
-    // Outside-Extension Metadata ID: "com.battle-system.friends"
-    // Example:
-    // metadata[`com.battle-system.friends/metadata_chatlog`] = {
-    //   chatlog: "How are you",
-    //   sender: "CoolExtension",
-    //   targetId: "User-OBR-Id" to send to yourself .. OR... "0000" to 'everyone'
-    //   created: new Date().toISOString()
-    // };
-    // await OBR.scene.setMetadata(metadata);
-
-    color: string;
+    rollHtml: string; // result of a roll to broadcast
 }
 
 interface IBRPRoll
@@ -56,8 +44,22 @@ interface IBRPRoll
     fumble?: number;
 }
 
-enum GameSystem
+interface ResultsData
 {
-    Normal = "Normal",
-    Abnormal = "Abnormal",
+    rolls: Roll[] | { [key: string]: Roll };
+    value?: number;
+}
+
+interface Roll
+{
+    die?: number;
+    sides?: number;
+    success?: boolean | null;
+    failures?: number;
+    value?: number;
+    modifier?: number;
+    critical?: string;
+    drop?: boolean;
+    reroll?: boolean;
+    explode?: boolean;
 }

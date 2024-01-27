@@ -45,9 +45,17 @@
     }
 }
 
+#whatsNew {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+}
+
 .header {
     text-align: center;
     font-weight: bold;
+    padding-bottom: 4px;
 }
 
 #rollLog {
