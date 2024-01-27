@@ -134,7 +134,7 @@ OBR.onReady(async () =>
 
                     } catch (error)
                     {
-                        await OBR.notification.show("Unable to display Dice in your browser", "ERROR");
+                        await OBR.notification.show("Unable to display Dice in your browser:"+ error, "ERROR");
                         await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
                         await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
                         ERROR = true;
