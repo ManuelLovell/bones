@@ -27,7 +27,7 @@ OBR.onReady(async () =>
         "#bones-window-body-app", // target DOM element to inject the canvas for rendering
         {
             id: "dice-canvas", // canvas element id
-            assetPath: "/assets/",
+            assetPath: "/assets/dice-box/",
             startingHeight: 8,
             throwForce: 10,
             spinForce: 5,
