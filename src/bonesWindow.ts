@@ -15,6 +15,8 @@ OBR.onReady(async () =>
     let diceColor = roomMetadata[Constants.DICECOLORSETTING + defaultId] as string;
     let diceTexture = roomMetadata[Constants.DICETEXTURESETTING + defaultId] as string;
     let defaultViewers: "GM" | "SELF" | "ALL" = "SELF";
+    let ERROR = false;
+    let AUTOTIMER;
 
     let customName = "";
     let customColor = "";
@@ -66,14 +68,23 @@ OBR.onReady(async () =>
 
         const finalMessage = `You rolled a ${finalResults.value}!`;
         await OBR.notification.show(finalMessage, "DEFAULT");
-
+        clearTimeout(AUTOTIMER);
         setTimeout(async () =>
         {
             await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
             await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
         }, 1000);
     }
-    Dice.init();
+
+    ///StartUp
+    try
+    {
+        Dice.init();
+    } catch (error)
+    {
+        await OBR.notification.show("Unable to initialize 3D-Dice", "ERROR");
+        ERROR = true;
+    }
 
     OBR.room.onMetadataChange(metadata =>
     {
@@ -88,24 +99,47 @@ OBR.onReady(async () =>
         defaultName = self.name;
         defaultId = self.id;
 
-        if (self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] != undefined)
+        if (ERROR)
         {
-            const messageContainer = self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
-
-            if (!MESSAGES.IsThisOld(messageContainer.created, defaultId, "DEFAULT"))
+            await OBR.notification.show("Unable to display Dice in your browser", "ERROR");
+        }
+        else
+        {
+            if (self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] != undefined)
             {
-                customName = messageContainer.senderName ?? defaultName;
-                customViewers = messageContainer.viewers ?? defaultViewers;
-                customColor = messageContainer.senderColor ?? defaultColor;
+                const messageContainer = self.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
 
-                const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
-                const VIEWPORTWIDTH = await OBR.viewport.getWidth();
+                if (!MESSAGES.IsThisOld(messageContainer.created, defaultId, "DEFAULT"))
+                {
+                    customName = messageContainer.senderName ?? defaultName;
+                    customViewers = messageContainer.viewers ?? defaultViewers;
+                    customColor = messageContainer.senderColor ?? defaultColor;
 
-                await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, VIEWPORTHEIGHT - 50);
-                await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, VIEWPORTWIDTH - 50);
+                    const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
+                    const VIEWPORTWIDTH = await OBR.viewport.getWidth();
 
-                Dice.hide().clear();
-                Dice.show().roll(DRP.parseNotation(messageContainer.notation));
+                    await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, VIEWPORTHEIGHT - 50);
+                    await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, VIEWPORTWIDTH - 50);
+
+                    try
+                    {
+                        Dice.hide().clear();
+                        Dice.show().roll(DRP.parseNotation(messageContainer.notation));
+
+                        AUTOTIMER = setTimeout(async () =>
+                        {
+                            await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
+                            await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
+                        }, 6000);
+
+                    } catch (error)
+                    {
+                        await OBR.notification.show("Unable to display Dice in your browser", "ERROR");
+                        await OBR.popover.setHeight(Constants.EXTENSIONDICEWINDOWID, 0);
+                        await OBR.popover.setWidth(Constants.EXTENSIONDICEWINDOWID, 0);
+                        ERROR = true;
+                    }
+                }
             }
         }
     });
