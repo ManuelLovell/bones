@@ -216,9 +216,9 @@ OBR.onReady(async () =>
     Constants.BONESDICECONTROLLER.appendChild(dSixButton);
     Constants.BONESDICECONTROLLER.appendChild(dEightButton);
     Constants.BONESDICECONTROLLER.appendChild(dTenButton);
+    Constants.BONESDICECONTROLLER.appendChild(dHundredButton);
     Constants.BONESDICECONTROLLER.appendChild(dTwelveButton);
     Constants.BONESDICECONTROLLER.appendChild(dTwentyButton);
-    Constants.BONESDICECONTROLLER.appendChild(dHundredButton);
     Constants.BONESCONTROLLER.appendChild(diceButton);
 
     function ToggleDiceDisplay()
