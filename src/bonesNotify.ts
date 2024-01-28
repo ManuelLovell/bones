@@ -18,7 +18,7 @@ OBR.onReady(async () =>
             <div id="diceImage">
                 <img id="diceSvg" src="/dice-twenty.svg" alt="Dice Image">
             </div>
-            <div id="diceMessage">${message}</div>
+            <div id="diceMessage" class="dice-notification">${message}</div>
         </div>
     `;
     const htmlele = document.getElementById("notifyHtml") as HTMLElement;

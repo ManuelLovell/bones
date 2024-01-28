@@ -91,7 +91,7 @@ export class MessageTracker
                     // Flag to see if you're the sender
                     const log = document.createElement('li');
 
-                    log.className = "dice-log-item";
+                    log.className = "dice-log-item dice-notification";
                     log.innerHTML = `[${this.getTimestamp(bonesLog.created)}] ${appendTarget}<span style="font-weight: bold; color:${bonesLog.senderColor};">${bonesLog.senderName}</span> => ${rollHtml}`;
                     chatLog.append(log);
                     log.scrollIntoView(false);
@@ -137,7 +137,7 @@ export class MessageTracker
                     const chatLog = document.querySelector<HTMLUListElement>('#rollLog')!;
                     const log = document.createElement('li');
 
-                    log.className = "dice-log-item";
+                    log.className = "dice-log-item dice-notification";
                     log.innerHTML = `[${this.getTimestamp(bonesLog.created)}]<span style="font-weight: bold; color:${bonesLog.senderColor};">${bonesLog.senderName}</span> rolled out of view.`;
                     chatLog.append(log);
                     log.scrollIntoView(false);

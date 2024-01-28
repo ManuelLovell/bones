@@ -86,7 +86,7 @@ OBR.onReady(async () =>
     ///StartUp
     try
     {
-        Dice.init().then(() =>
+        Dice.init().then(async () =>
         {
             const messageContainer = playerMetadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
             customName = messageContainer.senderName ?? defaultName;
@@ -103,8 +103,17 @@ OBR.onReady(async () =>
 
             } catch (error)
             {
-                Dice.show().roll(DRP.parseNotation(messageContainer.notation), { theme: "default", themeColor: "#ff0000" });
-                SetAutoTimeout();
+                try
+                {
+                    // Safety check in case the texture/color is causing loading issues
+                    Dice.show().roll(DRP.parseNotation(messageContainer.notation), { theme: "default", themeColor: "#ff0000" });
+                    SetAutoTimeout();
+                } catch (error)
+                {
+                    // If we can't parse the formula, just leave so it doesnt block the screen.
+                    await OBR.notification.show("Unable to Parse Dice Notation", "ERROR");
+                    await OBR.popover.close(Constants.EXTENSIONDICEWINDOWID);
+                }
             }
         });
 

@@ -21,7 +21,7 @@
     --OBR-dark-blue: rgb(30, 34, 49);
     --OBR-dark-blue-transparent: rgba(30, 34, 49, 0.5);
     --OBR-Purple-Select: rgb(187, 153, 255);
-    --OBR-Purple-Select-transparent: rgb(187, 153, 255, 0.5);
+    --OBR-Purple-Select-Transparent: rgb(187, 153, 255, 0.5);
     --OBR-soft-outline: rgb(65, 65, 65);
 
     --invert: none;
@@ -36,6 +36,8 @@
         --OBR-soft-outline: rgb(196, 196, 196);
         --OBR-offset-fore: rgb(44, 44, 46);
         --OBR-offset-back: rgb(210, 210, 223);
+        --OBR-dark-blue-transparent: rgba(194, 195, 199, 0.5);
+        --OBR-offset-background: rgb(117, 117, 117);
         --OBR-dark-blue: rgb(209, 210, 217);
         --OBR-light-blue: rgb(231, 233, 238);
 
@@ -68,7 +70,7 @@
 #rollContainer {
     background-color: var(--OBR-dark-blue-transparent);
     border-radius: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--OBR-font);
     width: 100%;
     height: 10em;
 
@@ -78,9 +80,63 @@
     flex-direction: column-reverse;
 }
 
+/* MANUAL ROLL */
+#manualRollContainer {
+    margin-top: 8px;
+    display:flex;
+}
+
+#viewToggleContainer {
+    width: 50%;
+    display: flex;
+    justify-content:space-between;
+}
+#rollButton{
+    height:95%;
+    width:25px;
+    background-color: var(--OBR-dark-blue-transparent);
+    border-radius: 5px;
+    border: 1px solid var(--OBR-Purple-Select);
+    padding: 0 6px 0 6px;
+}
+.input-button {
+    background-color: var(--OBR-dark-blue-transparent);
+    border-radius: 5px;
+    color: var(--OBR-font);
+    border: 1px solid var(--OBR-font);
+    width: 40%;
+    margin-right:6px;
+    height: 2em;
+}
+
+.options-button {
+    cursor: pointer;
+    font-size: small;
+    color: var(--foreground-color);
+    background-color: var(--OBR-dark-blue-trans);
+    border: 1px solid var(--OBR-Purple-Select);
+    border-radius: 6px;
+    height:100%;
+}
+
+.options-hover:hover {
+    background-color: var(--OBR-Purple-Select-Transparent);
+}
+
+.options-active {
+    background-color: var(--BS-red) !important;
+}
+
 /* COLORIS */
+#colorisContainer {
+    width: 25%;
+    height: 3em;
+    margin-top: 1px;
+}
+
 .colorisContainer {
     width: 100%;
+    height: 3em;
     margin-bottom: 5px;
     border-radius: 5px;
     cursor: pointer;
@@ -89,9 +145,10 @@
 #diceColoris {
     cursor: pointer;
     width: 100%;
-    height: 2em;
+    height: 3em;
     padding: 0 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--OBR-font);
+    ;
     border-radius: 5px;
     font-family: inherit;
     font-size: inherit;
@@ -100,9 +157,8 @@
 }
 
 .full .clr-field button {
-    border: 1px solid #ccc;
+    border: 1px solid var(--OBR-font);
     width: 100%;
-    height: 100%;
     border-radius: 5px;
 }
 
@@ -113,11 +169,10 @@ select {
     /* Reset Select */
     appearance: none;
     outline: 10px var(--OBR-Purple-Select);
-    box-shadow: none;
     /* Personalize */
     flex: 1;
     padding: 0 1em;
-    color: #fff;
+    color: var(--OBR-font);
     background-color: var(--OBR-dark-blue);
     background-image: none;
     cursor: pointer;
@@ -132,11 +187,11 @@ select::-ms-expand {
 .select {
     position: relative;
     display: flex;
-    width: 100%;
+    width: 70%;
     height: 3em;
     border-radius: .25em;
     overflow: hidden;
-    border: 1px solid #ccc;
+    border: 1px solid var(--OBR-font);
 }
 
 /* Arrow */

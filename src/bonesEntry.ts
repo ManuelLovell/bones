@@ -1,19 +1,24 @@
-import OBR from '@owlbear-rodeo/sdk';
+import OBR, { Metadata } from '@owlbear-rodeo/sdk';
 import { BSCACHE } from './utilities/bsSceneCache';
 import { Constants } from './utilities/bsConstants';
 import Coloris from '@melloware/coloris';
 import * as Utilities from './utilities/bsUtilities';
 import "@melloware/coloris/dist/coloris.css";
 import './style.css'
+import './dice/dicenotify.css'
 
 Constants.BONESENTRY.innerHTML =
     `
-    <div class="header">Dice Color</div><div id="whatsNew"></div>
-    <div id="colorisContainer" class='coloris-container full'></div>
-    <div class="header">Dice Choice</div>
-    <div id="selectContainer" class="select"></div>
+    <div class="header">Dice Options</div><div id="whatsNew"></div>
+    <div style="display:flex; justify-content:space-between;">
+        <div id="selectContainer" class="select"></div>
+        <div id="colorisContainer" class='coloris-container full'></div>
+    </div>
     <div class="header">Dice Log</div>
     <div id="rollContainer"><ul id="rollLog"></ul></div>
+    <div id="manualRollContainer">
+        <div id="viewToggleContainer"></div>
+    </div>
 `;
 let VIEWPORTHEIGHT;
 let VIEWPORTWIDTH;
@@ -26,6 +31,7 @@ OBR.onReady(async () =>
 
     CreateColorSelect();
     CreateTextureSelect();
+    CreateManualRollArea();
 
     const whatsNewContainer = document.getElementById("whatsNew")!;
     whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
@@ -34,6 +40,103 @@ OBR.onReady(async () =>
     // Check if the button needs repositioning every 2 seconds.
     setInterval(handleViewportdChange, 2000);
 });
+
+function CreateManualRollArea()
+{
+    const manualRollContainer = document.getElementById("manualRollContainer")!;
+    const viewToggleContainer = document.getElementById("viewToggleContainer")!;
+
+    const inputButton = document.createElement('input');
+    inputButton.type = "text";
+    inputButton.placeholder = "Custom Roll";
+    inputButton.classList.add('input-button');
+
+    const selfButton = document.createElement('input');
+    selfButton.id = "manualRollSelfButton";
+    selfButton.type = 'button';
+    selfButton.classList.add('options-button');
+    selfButton.classList.add('options-hover');
+    selfButton.value = 'Self';
+    selfButton.dataset.active = Constants.FALSE;
+    selfButton.onclick = () => 
+    {
+        if (selfButton.dataset.active === Constants.TRUE)
+        {
+            selfButton.dataset.active = Constants.FALSE;
+            selfButton.classList.remove('options-active');
+        }
+        else
+        {
+            selfButton.dataset.active = Constants.TRUE;
+            selfButton.classList.add('options-active');
+        }
+    };
+
+    const gmButton = document.createElement('input');
+    gmButton.id = "manualRollGMButton";
+    gmButton.type = 'button';
+    gmButton.classList.add('options-button');
+    gmButton.classList.add('options-hover');
+    gmButton.value = 'GM';
+    gmButton.onclick = () =>
+    {
+        if (gmButton.dataset.active === Constants.TRUE)
+        {
+            gmButton.dataset.active = Constants.FALSE;
+            gmButton.classList.remove('options-active');
+        }
+        else
+        {
+            gmButton.dataset.active = Constants.TRUE;
+            gmButton.classList.add('options-active');
+        }
+    };
+
+    const rollButton = document.createElement('input');
+    rollButton.id = 'rollButton';
+    rollButton.type = 'image';
+    rollButton.src = '/dice-twenty.svg';
+    rollButton.onclick = async () =>
+    {
+        await SendRoll();
+    };
+    inputButton.onkeydown = async (e) =>
+    {
+        if (e.key === 'Enter') await SendRoll();
+    };
+
+    manualRollContainer.prepend(inputButton);
+    viewToggleContainer.appendChild(rollButton);
+    viewToggleContainer.appendChild(selfButton);
+    viewToggleContainer.appendChild(gmButton);
+
+    async function SendRoll()
+    {
+        const notation = inputButton.value;
+        if (notation.length > 0)
+        {
+            const selfview = selfButton.dataset.active;
+            const gmview = gmButton.dataset.active;
+            let viewedBy = "ALL";
+            if (selfview === "TRUE") viewedBy = "SELF";
+            if (gmview === "TRUE") viewedBy = "GM";
+
+            const metadata: Metadata = {};
+            const now = new Date().toISOString();
+            metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] // metadata[`com.battle-system.bones/metadata_bonesroll`]
+                = {
+                    notation: notation, //"8d6!",
+                    created: now, // new Date().toISOString()
+                    senderName: BSCACHE.playerName, // Name to display for Roll
+                    senderId: BSCACHE.playerId, // PlayerId | Self-Tracking-Number
+                    viewers: viewedBy // "ALL" | "GM" | "SELF"
+                } as IBonesRoll;
+
+            await OBR.player.setMetadata(metadata);
+        }
+        inputButton.value = "";
+    }
+}
 
 async function handleViewportdChange()
 {
@@ -120,13 +223,13 @@ function CreateColorSelect()
 
     };
     colorisContainer.appendChild(colorInput);
-
+    console.log(BSCACHE.theme.mode);
     Coloris.init();
     Coloris({
         alpha: false,
         theme: 'polaroid',
         closeButton: true,
-        themeMode: "dark",
+        themeMode: BSCACHE.theme.mode === "DARK" ? "dark" : "light",
         el: "#diceColoris",
     });
 }

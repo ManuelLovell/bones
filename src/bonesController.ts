@@ -12,12 +12,13 @@ OBR.onReady(async () =>
 
     let rollDict: { [key: string]: number } = {};
 
-    function createDiceButton(id: string, imageSrc: string): HTMLDivElement
+    function createDiceButton(id: string, imageSrc: string, tooltip: string): HTMLDivElement
     {
         const button = document.createElement('input');
         button.id = id;
         button.type = 'image';
         button.value = '0';
+        button.title = tooltip;
         button.src = imageSrc;
         button.classList.add("dice-button");
         button.onclick = (e) =>
@@ -125,12 +126,13 @@ OBR.onReady(async () =>
     optionsContainer.appendChild(gmButton);
     optionsContainer.appendChild(selfButton);
 
-    const dFourButton = createDiceButton('d4Button', '/dice-four.svg');
-    const dSixButton = createDiceButton('d6Button', '/dice-six.svg');
-    const dEightButton = createDiceButton('d8Button', '/dice-eight.svg');
-    const dTenButton = createDiceButton('d10Button', '/dice-ten.svg');
-    const dTwelveButton = createDiceButton('d12Button', '/dice-twelve.svg');
-    const dTwentyButton = createDiceButton('d20Button', '/dice-twenty.svg');
+    const dFourButton = createDiceButton('d4Button', '/dice-four.svg', "Add a Four-Sided Dice");
+    const dSixButton = createDiceButton('d6Button', '/dice-six.svg', "Add a Six-Sided Dice");
+    const dEightButton = createDiceButton('d8Button', '/dice-eight.svg',"Add a Eight-Sided Dice");
+    const dTenButton = createDiceButton('d10Button', '/dice-ten.svg',"Add a Ten-Sided Dice");
+    const dTwelveButton = createDiceButton('d12Button', '/dice-twelve.svg',"Add a Twelve-Sided Dice");
+    const dTwentyButton = createDiceButton('d20Button', '/dice-twenty.svg',"Add a Twenty-Sided Dice");
+    const dHundredButton = createDiceButton('d100Button', '/dice-hundred.svg',"Add a Percentile and Ten-Sided Dice");
 
     const diceButton = document.createElement('input');
     diceButton.id = "diceWindowOpen";
@@ -145,7 +147,7 @@ OBR.onReady(async () =>
             diceButton.src = diceCloseImg;
             diceButton.value = Constants.OPEN;
             diceButton.hidden = true;
-            await OBR.popover.setHeight(Constants.EXTENSIONDICECONTROLLERID, 420);
+            await OBR.popover.setHeight(Constants.EXTENSIONDICECONTROLLERID, 475);
             ToggleDiceDisplay();
             diceButton.hidden = false;
             gmButton.classList.add('options-hover');
@@ -174,7 +176,7 @@ OBR.onReady(async () =>
                 const now = new Date().toISOString();
                 metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] // metadata[`com.battle-system.bones/metadata_bonesroll`]
                     = {
-                        notation: rollEquation, // "2d20kh1"
+                        notation: rollEquation, //"8d6!",
                         created: now, // new Date().toISOString()
                         senderName: userName, // Name to display for Roll
                         senderId: userId, // PlayerId | Self-Tracking-Number
@@ -216,6 +218,7 @@ OBR.onReady(async () =>
     Constants.BONESDICECONTROLLER.appendChild(dTenButton);
     Constants.BONESDICECONTROLLER.appendChild(dTwelveButton);
     Constants.BONESDICECONTROLLER.appendChild(dTwentyButton);
+    Constants.BONESDICECONTROLLER.appendChild(dHundredButton);
     Constants.BONESCONTROLLER.appendChild(diceButton);
 
     function ToggleDiceDisplay()
@@ -223,7 +226,7 @@ OBR.onReady(async () =>
         if (Constants.BONESDICECONTROLLER.classList.contains('hidden'))
         {
             Constants.BONESDICECONTROLLER.classList.remove('hidden');
-            Constants.BONESDICECONTROLLER.style.height = '358px';
+            Constants.BONESDICECONTROLLER.style.height = '412px';
         } else
         {
             Constants.BONESDICECONTROLLER.classList.add('hidden');
