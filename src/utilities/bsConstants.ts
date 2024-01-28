@@ -1,6 +1,6 @@
 export class Constants
 {
-    static VERSION = "whatsnew-bones-100";
+    static VERSION = "whatsnew-bones-101";
     static EXTENSIONID = "com.battle-system.bones";
     static EXTENSIONDICEWINDOWID = "com.battle-system.bones-dicewindow";
     static EXTENSIONDICECONTROLLERID = "com.battle-system.bones-dicecontroller";
