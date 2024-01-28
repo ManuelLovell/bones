@@ -127,6 +127,6 @@ OBR.onReady(async () =>
         AUTOTIMER = setTimeout(async () =>
         {
             await OBR.popover.close(Constants.EXTENSIONDICEWINDOWID);
-        }, 6000);
+        }, 10000);
     }
 });
