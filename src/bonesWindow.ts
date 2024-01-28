@@ -13,7 +13,12 @@ OBR.onReady(async () =>
     const defaultName = await OBR.player.getName();
     const defaultColor = await OBR.player.getColor();
     const diceColor = roomMetadata[Constants.DICECOLORSETTING + defaultId] as string;
-    const diceTexture = roomMetadata[Constants.DICETEXTURESETTING + defaultId] as string;
+    let diceTexture = roomMetadata[Constants.DICETEXTURESETTING + defaultId] as string;
+
+    if (!Constants.DEFAULTTEXTURES.includes(diceTexture))
+    {
+        diceTexture = "default";
+    }
 
     let defaultViewers: "GM" | "SELF" | "ALL" = "SELF";
     let AUTOTIMER;

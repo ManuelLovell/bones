@@ -137,17 +137,8 @@ class BSCache
             this.roomMetadata = await OBR.room.getMetadata();
             this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff0000";
             this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "default";
-            const defaultTextureSafetyCheck = [
-                "default",
-                "diceOfRolling",
-                "gemstone",
-                "gemstoneMarble",
-                "rock",
-                "rust",
-                "smooth",
-                "wooden"
-            ];
-            if (!defaultTextureSafetyCheck.includes(this.playerDiceTexture))
+            
+            if (!Constants.DEFAULTTEXTURES.includes(this.playerDiceTexture))
             {
                 this.playerDiceTexture = "default";
             }

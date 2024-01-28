@@ -28,6 +28,17 @@ export class Constants
     static BONESCONTROLLER = document.querySelector<HTMLDivElement>('#bones-controller-body-app') as HTMLDivElement;
     static BONESDICECONTROLLER = document.querySelector<HTMLDivElement>('#bones-controller-dice') as HTMLDivElement;
     static BONESNOTIFICATIONS = document.querySelector<HTMLDivElement>('#bones-notify-body-app') as HTMLDivElement;
+
+    static DEFAULTTEXTURES = [
+        "default",
+        "diceOfRolling",
+        "gemstone",
+        "gemstoneMarble",
+        "rock",
+        "rust",
+        "smooth",
+        "wooden"
+    ];
 }
 
 
