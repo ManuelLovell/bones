@@ -1,5 +1,10 @@
-import{O as e,C as o}from"./bsConstants-vq7ZmLno.js";const s=document.querySelector("#bs-whatsnew"),r=document.querySelector("#bs-whatsnew-notes");s.innerHTML=`
+import{O as e,C as o}from"./bsConstants-mb-QB5VY.js";const n=document.querySelector("#bs-whatsnew"),s=document.querySelector("#bs-whatsnew-notes");n.innerHTML=`
   <div id="newsContainer">
+    <h1>Bones! 2/5</h1>
+    </br> You'll notice.. everything got moved around.  In order to get approved for the store I had to compromise on some things that couldn't be achieved.
+    </br> All in all, it should still function the same.  But now you can drag the Action popover wherever you want, and rolling doesn't collapse the window.
+    </br> (Technically I could still, but it looks/feels weird with the tiny action icon..)
+    </br>
     <h1>Bones! 1/28</h1>
     </br> You'll notice a few changes. Like the link to the Roll20 Dice reference.
     <li> Better response notifications on dice results. (Improved styling)
@@ -14,7 +19,7 @@ import{O as e,C as o}from"./bsConstants-vq7ZmLno.js";const s=document.querySelec
     </br> Also took a layer off the 'hidden' dice rolls. Now it lets people know you rolled (As was suggested by a Discord member), but doesn't tell them the results.
     </br>
   </div>
-`;e.onReady(async()=>{r.innerHTML=`
+`;e.onReady(async()=>{s.innerHTML=`
     <div id="footButtonContainer">
         <a href="https://www.patreon.com/battlesystem" target="_blank">Patreon!</a>
         <a href="https://discord.gg/ANZKDmWzr6" target="_blank">OBR Discord!</a>
