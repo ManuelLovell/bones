@@ -8,6 +8,11 @@ const footer = document.querySelector<HTMLElement>('#bs-whatsnew-notes')!;
 
 whatsnew.innerHTML = `
   <div id="newsContainer">
+    <h1>Bones! 2/5</h1>
+    </br> You'll notice.. everything got moved around.  In order to get approved for the store I had to compromise on some things that couldn't be achieved.
+    </br> All in all, it should still function the same.  But now you can drag the Action popover wherever you want, and rolling doesn't collapse the window.
+    </br> (Technically I could still, but it looks/feels weird with the tiny action icon..)
+    </br>
     <h1>Bones! 1/28</h1>
     </br> You'll notice a few changes. Like the link to the Roll20 Dice reference.
     <li> Better response notifications on dice results. (Improved styling)

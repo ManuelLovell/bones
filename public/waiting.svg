@@ -1,0 +1,15 @@
+<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1">
+ <desc>Created with Fabric.js 5.2.4</desc>
+
+ <g>
+  <title>Layer 1</title>
+  <rect id="svg_1" fill="transparent" height="100%" width="100%" y="0" x="0"/>
+  <g id="a6f246a6-7351-4bd5-a60a-e50eb6094cc9" transform="matrix(1 0 0 1 540 540)">
+   <rect id="svg_2" fill-rule=" nonzero" fill="none" stroke-miterlimit="4" stroke-linejoin=" miter" stroke-dashoffset="0" stroke-linecap=" butt" stroke-dasharray=" none" height="1080" width="1080" y="-540" x="-540" vector-effect="non-scaling-stroke"/>
+  </g>
+  <g id="11cd9d27-036e-42a5-8e17-0133f4e1cb60" transform="matrix(1 0 0 1 540 540)"/>
+  <text font-weight="bold" transform="matrix(11.7399 0 0 11.7399 -1010.05 -460.106)" stroke="null" xml:space="preserve" text-anchor="start" font-family="'Inter'" font-size="24" id="svg_4" y="73.86907" x="90.36311" stroke-width="0" fill="#fcfcfc">Waiting</text>
+  <text transform="matrix(12.8432 0 0 12.8432 -4001.82 -6203.9)" stroke="null" font-weight="bold" xml:space="preserve" text-anchor="start" font-family="'Inter'" font-size="24" id="svg_5" y="551.26891" x="318.00071" stroke-width="0" fill="#ffffff">Scene</text>
+  <text transform="matrix(9.27295 0 0 9.27295 -3728.55 -4093.77)" stroke="null" font-weight="bold" xml:space="preserve" text-anchor="start" font-family="'Inter'" font-size="24" id="svg_6" y="510.23637" x="444.95406" stroke-width="0" fill="#ffffff">for</text>
+ </g>
+</svg>

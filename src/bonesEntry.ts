@@ -1,61 +1,111 @@
 import OBR, { Metadata } from '@owlbear-rodeo/sdk';
-import { BSCACHE } from './utilities/bsSceneCache';
 import { Constants } from './utilities/bsConstants';
-import Coloris from '@melloware/coloris';
-import * as Utilities from './utilities/bsUtilities';
-import "@melloware/coloris/dist/coloris.css";
-import './style.css'
-import './dice/dicenotify.css'
-
-Constants.BONESENTRY.innerHTML =
-    `
-    <div class="header">Dice Options</div><div id="whatsNew"></div>
-    <div style="display:flex; justify-content:space-between;">
-        <div id="selectContainer" class="select"></div>
-        <div id="colorisContainer" class='coloris-container full'></div>
-    </div>
-    <div class="header">Dice Log</div>
-    <div id="rollContainer"><ul id="rollLog"></ul></div>
-    <div id="manualRollContainer">
-        <div id="viewToggleContainer"></div>
-    </div>
-`;
-let VIEWPORTHEIGHT;
-let VIEWPORTWIDTH;
+import './dice/dicecontroller.css'
 
 // Setup OBR functions
 OBR.onReady(async () =>
 {
-    await BSCACHE.InitializeCache();
-    BSCACHE.SetupHandlers();
+    const diceWaitingImg = '/noscene.svg';
+    const diceCloseImg = '/cancel-dice.svg';
+    const diceGoImg = '/go.svg';
+    const userName = await OBR.player.getName();
+    const userId = await OBR.player.getId();
 
-    CreateColorSelect();
-    CreateTextureSelect();
-    CreateManualRollArea();
+    await OBR.popover.open({
+        id: Constants.EXTENSIONDICECONTROLLERID,
+        url: '/dicecontroller.html',
+        height: 350,
+        width: 0,
+        anchorOrigin: {
+            horizontal: "RIGHT",
+            vertical: "BOTTOM"
+        },
+        transformOrigin: {
+            horizontal: "RIGHT",
+            vertical: "BOTTOM"
+        },
+        disableClickAway: true,
+        marginThreshold: 120
+    });
 
-    const whatsNewContainer = document.getElementById("whatsNew")!;
-    whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
+    let rollDict: { [key: string]: number } = {};
 
-    await OpenDiceController();
-    // Check if the button needs repositioning every 2 seconds.
-    setInterval(handleViewportdChange, 2000);
-});
+    function createDiceButton(id: string, imageSrc: string, tooltip: string): HTMLDivElement
+    {
+        const button = document.createElement('input');
+        button.id = id;
+        button.type = 'image';
+        button.value = '0';
+        button.title = tooltip;
+        button.src = imageSrc;
+        button.classList.add("dice-button");
+        button.onclick = (e) =>
+        {
+            let diceCount = parseInt(label.innerText);
+            e.stopPropagation();
+            e.preventDefault();
 
-function CreateManualRollArea()
-{
-    const manualRollContainer = document.getElementById("manualRollContainer")!;
-    const viewToggleContainer = document.getElementById("viewToggleContainer")!;
+            if (diceCount === 0)
+            {
+                label.hidden = false;
+            }
 
-    const inputButton = document.createElement('input');
-    inputButton.type = "text";
-    inputButton.placeholder = "Custom Roll";
-    inputButton.classList.add('input-button');
+            if (diceCount < 20)
+            {
+                diceCount++;
+                label.innerText = diceCount.toString();
+                rollDict[id] = diceCount;
+            }
+
+            const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
+            if (ticks === 0) diceButton.src = diceCloseImg;
+            else diceButton.src = diceGoImg;
+        };
+        button.oncontextmenu = (e) => 
+        {
+            let diceCount = parseInt(label.innerText);
+            e.stopPropagation();
+            e.preventDefault();
+            if (diceCount > 0)
+            {
+                diceCount--;
+                label.innerText = diceCount.toString();
+                rollDict[id] = diceCount;
+            }
+            if (diceCount === 0)
+            {
+                label.hidden = true;
+            }
+
+            const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
+            if (ticks === 0) diceButton.src = diceCloseImg;
+            else diceButton.src = diceGoImg;
+        };
+
+        const container = document.createElement('div');
+        container.id = id + "Container";
+        container.classList.add("label-container");
+
+        const label = document.createElement('label');
+        label.innerText = "0";
+        label.id = id + "Label";
+        label.classList.add("label");
+        label.classList.add("dice-counter");
+        label.hidden = true;
+
+        container.appendChild(button);
+        container.appendChild(label);
+
+        return container;
+    }
+
+    const optionsContainer = document.createElement('div');
+    optionsContainer.classList.add('options-container');
 
     const selfButton = document.createElement('input');
-    selfButton.id = "manualRollSelfButton";
+    selfButton.id = "rollSelfButton";
     selfButton.type = 'button';
     selfButton.classList.add('options-button');
-    selfButton.classList.add('options-hover');
     selfButton.value = 'Self';
     selfButton.dataset.active = Constants.FALSE;
     selfButton.onclick = () => 
@@ -73,10 +123,9 @@ function CreateManualRollArea()
     };
 
     const gmButton = document.createElement('input');
-    gmButton.id = "manualRollGMButton";
+    gmButton.id = "rollGMButton";
     gmButton.type = 'button';
     gmButton.classList.add('options-button');
-    gmButton.classList.add('options-hover');
     gmButton.value = 'GM';
     gmButton.onclick = () =>
     {
@@ -92,31 +141,63 @@ function CreateManualRollArea()
         }
     };
 
-    const rollButton = document.createElement('input');
-    rollButton.id = 'rollButton';
-    rollButton.type = 'image';
-    rollButton.src = '/dice-twenty.svg';
-    rollButton.onclick = async () =>
+    const optionsButton = document.createElement('input');
+    optionsButton.id = "showLogButton";
+    optionsButton.type = 'button';
+    optionsButton.classList.add('options-button');
+    optionsButton.value = 'Log';
+    optionsButton.dataset.active = Constants.CLOSE;
+    optionsButton.onclick = async () =>
     {
-        await SendRoll();
-    };
-    inputButton.onkeydown = async (e) =>
-    {
-        if (e.key === 'Enter') await SendRoll();
-    };
-
-    manualRollContainer.prepend(inputButton);
-    viewToggleContainer.appendChild(rollButton);
-    viewToggleContainer.appendChild(selfButton);
-    viewToggleContainer.appendChild(gmButton);
-
-    async function SendRoll()
-    {
-        const notation = inputButton.value;
-        if (notation.length > 0)
+        if (optionsButton.dataset.active === Constants.OPEN)
         {
+            optionsButton.dataset.active = Constants.CLOSE;
+            await OBR.popover.setWidth(Constants.EXTENSIONDICECONTROLLERID, 0);
+            optionsButton.classList.remove('options-active');
+        }
+        else
+        {
+            optionsButton.dataset.active = Constants.OPEN;
+            await OBR.popover.setWidth(Constants.EXTENSIONDICECONTROLLERID, 220);
+            optionsButton.classList.add('options-active');
+        }
+    };
+
+    optionsContainer.appendChild(optionsButton);
+    optionsContainer.appendChild(gmButton);
+    optionsContainer.appendChild(selfButton);
+
+    const dFourButton = createDiceButton('d4Button', '/dice-four.svg', "Add a Four-Sided Dice");
+    const dSixButton = createDiceButton('d6Button', '/dice-six.svg', "Add a Six-Sided Dice");
+    const dEightButton = createDiceButton('d8Button', '/dice-eight.svg', "Add a Eight-Sided Dice");
+    const dTenButton = createDiceButton('d10Button', '/dice-ten.svg', "Add a Ten-Sided Dice");
+    const dTwelveButton = createDiceButton('d12Button', '/dice-twelve.svg', "Add a Twelve-Sided Dice");
+    const dTwentyButton = createDiceButton('d20Button', '/dice-twenty.svg', "Add a Twenty-Sided Dice");
+    const dHundredButton = createDiceButton('d100Button', '/dice-hundred.svg', "Add a Percentile and Ten-Sided Dice");
+
+    const sceneReady = await OBR.scene.isReady();
+
+    const diceButton = document.createElement('input');
+    diceButton.id = "diceWindowOpen";
+    diceButton.type = 'image';
+    diceButton.src = sceneReady ? diceCloseImg : diceWaitingImg;
+    diceButton.disabled = !sceneReady;
+    diceButton.classList.add("dice-button");
+    diceButton.onclick = async () =>
+    {
+        const rolls: string[] = [];
+        for (const [buttonId, count] of Object.entries(rollDict))
+        {
+            const diceType = buttonId.replace('Button', '');
+            rolls.push(`${count}${diceType}`);
+        }
+
+        if (rolls.length !== 0)
+        {
+            const rollEquation = rolls.join('+');
             const selfview = selfButton.dataset.active;
             const gmview = gmButton.dataset.active;
+
             let viewedBy = "ALL";
             if (selfview === "TRUE") viewedBy = "SELF";
             if (gmview === "TRUE") viewedBy = "GM";
@@ -125,149 +206,56 @@ function CreateManualRollArea()
             const now = new Date().toISOString();
             metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] // metadata[`com.battle-system.bones/metadata_bonesroll`]
                 = {
-                    notation: notation, //"8d6!",
+                    notation: rollEquation, //"8d6!",
                     created: now, // new Date().toISOString()
-                    senderName: BSCACHE.playerName, // Name to display for Roll
-                    senderId: BSCACHE.playerId, // PlayerId | Self-Tracking-Number
+                    senderName: userName, // Name to display for Roll
+                    senderId: userId, // PlayerId | Self-Tracking-Number
                     viewers: viewedBy // "ALL" | "GM" | "SELF"
                 } as IBonesRoll;
 
             await OBR.player.setMetadata(metadata);
+            ResetDiceCounters();
         }
-        inputButton.value = "";
-    }
-}
-
-async function handleViewportdChange()
-{
-    const currentHeight = await OBR.viewport.getHeight();
-    const currentWidth = await OBR.viewport.getWidth();
-
-    if (currentHeight !== VIEWPORTHEIGHT || currentWidth !== VIEWPORTWIDTH)
-    {
-        await OBR.popover.close(Constants.EXTENSIONDICECONTROLLERID);
-        await OpenDiceController();
-        VIEWPORTHEIGHT = currentHeight;
-        VIEWPORTWIDTH = currentWidth;
-    }
-}
-
-async function OpenDiceController()
-{
-    try
-    {
-        await OpenDiceControllerInner();
-    } catch (error)
-    {
-        setTimeout(async () =>
-        {
-            await OpenDiceControllerInner();
-        }, 2000);
-    }
-}
-
-async function OpenDiceControllerInner()
-{
-    VIEWPORTHEIGHT = await OBR.viewport.getHeight();
-    VIEWPORTWIDTH = await OBR.viewport.getWidth();
-
-    await OBR.popover.close(Constants.EXTENSIONDICECONTROLLERID);
-    await OBR.popover.open({
-        id: Constants.EXTENSIONDICECONTROLLERID,
-        url: '/dicecontroller.html',
-        height: 54,
-        width: 54,
-        anchorPosition: { top: VIEWPORTHEIGHT - 75, left: VIEWPORTWIDTH - 20 },
-        anchorReference: "POSITION",
-        anchorOrigin: {
-            vertical: "BOTTOM",
-            horizontal: "RIGHT",
-        },
-        transformOrigin: {
-            vertical: "BOTTOM",
-            horizontal: "RIGHT",
-        },
-        disableClickAway: true,
-        hidePaper: true
-    });
-}
-
-function CreateColorSelect()
-{
-    let debouncer: ReturnType<typeof setTimeout>;
-
-    const colorisContainer = document.getElementById('colorisContainer')!;
-
-    const colorInput = document.createElement('input');
-    colorInput.type = "text";
-    colorInput.classList.add('coloris');
-    colorInput.id = "diceColoris";
-    colorInput.value = BSCACHE.playerDiceColor;
-    colorInput.maxLength = 7;
-    colorInput.oninput = async (event: Event) =>
-    {
-        if (!event || !event.target) return;
-        const target = event.target as HTMLInputElement;
-
-        clearTimeout(debouncer);
-
-        // Debounce this input to avoid hitting OBR rate limit
-        debouncer = setTimeout(async () =>
-        {
-            const hexTest = /#[a-f0-9]{6}/
-            if (hexTest.test(target.value))
-            {
-                await OBR.room.setMetadata({ [Constants.DICECOLORSETTING + BSCACHE.playerId]: target.value });
-            }
-        }, 400);
-
     };
-    colorisContainer.appendChild(colorInput);
-    console.log(BSCACHE.theme.mode);
-    Coloris.init();
-    Coloris({
-        alpha: false,
-        theme: 'polaroid',
-        closeButton: true,
-        themeMode: BSCACHE.theme.mode === "DARK" ? "dark" : "light",
-        el: "#diceColoris",
-    });
-}
-
-function CreateTextureSelect()
-{
-    const selectContainer = document.getElementById('selectContainer')!;
-
-    const selector = <HTMLSelectElement>document.createElement('select');
-    selector.id = "textureSelect";
-
-    const textures = [
-        { text: "Default", value: "default" },
-        { text: "D.o.R", value: "diceOfRolling" },
-        { text: "Gemstone", value: "gemstone" },
-        { text: "Marble", value: "gemstoneMarble" },
-        { text: "Rocky", value: "rock" },
-        { text: "Rusty", value: "rust" },
-        { text: "Smooth", value: "smooth" },
-        { text: "Wood", value: "wooden" },
-    ];
-
-    textures.forEach((texture) =>
+    diceButton.oncontextmenu = async (e) =>
     {
-        const option = document.createElement("option");
-        option.setAttribute('value', texture.value);
-        const text = document.createTextNode(texture.text);
-        option.appendChild(text);
+        e.stopPropagation();
+        e.preventDefault();
+        ResetDiceCounters();
+    };
 
-        selector.appendChild(option);
-    });
-    selector.value = BSCACHE.playerDiceTexture;
+    Constants.BONESDICECONTROLLER.appendChild(optionsContainer);
+    Constants.BONESDICECONTROLLER.appendChild(dFourButton);
+    Constants.BONESDICECONTROLLER.appendChild(dSixButton);
+    Constants.BONESDICECONTROLLER.appendChild(dEightButton);
+    Constants.BONESDICECONTROLLER.appendChild(dTenButton);
+    Constants.BONESDICECONTROLLER.appendChild(dHundredButton);
+    Constants.BONESDICECONTROLLER.appendChild(dTwelveButton);
+    Constants.BONESDICECONTROLLER.appendChild(dTwentyButton);
+    Constants.BONESCONTROLLER.appendChild(diceButton);
 
-    selector.onchange = async (event) =>
+    function ResetDiceCounters()
     {
-        const target = event.currentTarget as HTMLSelectElement;
-        await OBR.room.setMetadata({ [Constants.DICETEXTURESETTING + BSCACHE.playerId]: target.value });
+        rollDict = {};
+        const diceCounters = document.querySelectorAll<HTMLLabelElement>('.dice-counter');
+        diceButton.src = diceCloseImg;
+        gmButton.dataset.active = Constants.FALSE;
+        gmButton.classList.remove('options-active');
+        gmButton.classList.remove('options-hover');
+        selfButton.dataset.active = Constants.FALSE;
+        selfButton.classList.remove('options-active');
+        selfButton.classList.remove('options-hover');
+        diceCounters.forEach((counter) =>
+        {
+            counter.hidden = true;
+            counter.innerText = '0';
+        });
     }
-    selectContainer.appendChild(selector);
 
-}
+    // Disable button if scene isn't ready, cannot access viewport controls without it
+    OBR.scene.onReadyChange((ready) =>
+    {
+        diceButton.disabled = !ready;
+        diceButton.src = ready ? diceCloseImg : diceWaitingImg;
+    });
+});

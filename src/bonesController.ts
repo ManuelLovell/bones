@@ -1,173 +1,144 @@
 import OBR, { Metadata } from '@owlbear-rodeo/sdk';
+import { BSCACHE } from './utilities/bsSceneCache';
 import { Constants } from './utilities/bsConstants';
-import './dice/dicecontroller.css'
+import Coloris from '@melloware/coloris';
+import * as Utilities from './utilities/bsUtilities';
+import "@melloware/coloris/dist/coloris.css";
+import './style.css'
+import './dice/dicenotify.css'
+
+Constants.BONESENTRY.innerHTML =
+    `    
+    <div class="header"><span style="float:left;" id="optionsToggle">▼</span>Dice Options</div><div id="whatsNew"></div>
+    <div id="optionsContainer">
+        <div style="display:flex; justify-content:space-between;">
+            <div id="selectContainer" class="select"></div>
+            <div id="colorisContainer" class='coloris-container full'></div>
+        </div>
+    </div>
+    <div class="header"><span style="float:left;" id="rollToggle">▼</span>Dice Log</div>
+    <div id="rollContainer"><ul id="rollLog"></ul></div>
+    <div class="header"><span style="float:left;" id="manualRollToggle">▼</span>Custom Rolls</div>
+    <div id="manualRollContainer">
+        <div id="viewToggleContainer"></div>
+    </div>`;
 
 OBR.onReady(async () =>
 {
-    const diceOpenImg = '/dice-twenty.svg';
-    const diceCloseImg = '/cancel-dice.svg';
-    const diceGoImg = '/go.svg';
-    const userName = await OBR.player.getName();
-    const userId = await OBR.player.getId();
+    await BSCACHE.InitializeCache();
+    BSCACHE.SetupHandlers();
 
-    let rollDict: { [key: string]: number } = {};
+    CreateColorSelect();
+    CreateTextureSelect();
+    CreateManualRollArea();
 
-    function createDiceButton(id: string, imageSrc: string, tooltip: string): HTMLDivElement
+    const whatsNewContainer = document.getElementById("whatsNew")!;
+    whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
+
+    CreateCollapser("optionsToggle", "optionsContainer", 50, "block");
+    CreateCollapser("rollToggle", "rollContainer", 160, "block");
+    CreateCollapser("manualRollToggle", "manualRollContainer", 31, "flex");
+
+    function CreateCollapser(toggleName: string, containerName: string, height: number, display: string)
     {
-        const button = document.createElement('input');
-        button.id = id;
-        button.type = 'image';
-        button.value = '0';
-        button.title = tooltip;
-        button.src = imageSrc;
-        button.classList.add("dice-button");
-        button.onclick = (e) =>
+        const toggle = document.getElementById(toggleName) as HTMLSpanElement;
+        toggle.style.cursor = "pointer";
+        const container = document.getElementById(containerName) as HTMLDivElement;
+        toggle.onclick = async () =>
         {
-            let diceCount = parseInt(label.innerText);
-            e.stopPropagation();
-            e.preventDefault();
-
-            if (diceCount === 0)
+            const actionHeight = await OBR.popover.getHeight(Constants.EXTENSIONDICECONTROLLERID) as number;
+            //Container is 50px
+            if (container.style.display !== "none")
             {
-                label.hidden = false;
+                toggle.innerText = "▶";
+                await OBR.popover.setHeight(Constants.EXTENSIONDICECONTROLLERID, actionHeight - height);
+                container.style.display = "none";
             }
-
-            if (diceCount < 20)
+            else
             {
-                diceCount++;
-                label.innerText = diceCount.toString();
-                rollDict[id] = diceCount;
+                toggle.innerText = "▼";
+                await OBR.popover.setHeight(Constants.EXTENSIONDICECONTROLLERID, actionHeight + height);
+                container.style.display = display;
             }
-
-            const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
-            if (ticks === 0) diceButton.src = diceCloseImg;
-            else diceButton.src = diceGoImg;
         };
-        button.oncontextmenu = (e) => 
-        {
-            let diceCount = parseInt(label.innerText);
-            e.stopPropagation();
-            e.preventDefault();
-            if (diceCount > 0)
-            {
-                diceCount--;
-                label.innerText = diceCount.toString();
-                rollDict[id] = diceCount;
-            }
-            if (diceCount === 0)
-            {
-                label.hidden = true;
-            }
-
-            const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
-            if (ticks === 0) diceButton.src = diceCloseImg;
-            else diceButton.src = diceGoImg;
-        };
-
-        const container = document.createElement('div');
-        container.id = id + "Container";
-        container.classList.add("label-container");
-
-        const label = document.createElement('label');
-        label.innerText = "0";
-        label.id = id + "Label";
-        label.classList.add("label");
-        label.classList.add("dice-counter");
-        label.hidden = true;
-
-        container.appendChild(button);
-        container.appendChild(label);
-
-        return container;
     }
 
-    const optionsContainer = document.createElement('div');
-    optionsContainer.classList.add('options-container');
-
-    const selfButton = document.createElement('input');
-    selfButton.id = "rollSelfButton";
-    selfButton.type = 'button';
-    selfButton.classList.add('options-button');
-    selfButton.value = 'Self';
-    selfButton.dataset.active = Constants.FALSE;
-    selfButton.onclick = () => 
+    function CreateManualRollArea()
     {
-        if (selfButton.dataset.active === Constants.TRUE)
-        {
-            selfButton.dataset.active = Constants.FALSE;
-            selfButton.classList.remove('options-active');
-        }
-        else
-        {
-            selfButton.dataset.active = Constants.TRUE;
-            selfButton.classList.add('options-active');
-        }
-    };
+        const manualRollContainer = document.getElementById("manualRollContainer")!;
+        const viewToggleContainer = document.getElementById("viewToggleContainer")!;
 
-    const gmButton = document.createElement('input');
-    gmButton.id = "rollGMButton";
-    gmButton.type = 'button';
-    gmButton.classList.add('options-button');
-    gmButton.value = 'GM';
-    gmButton.onclick = () =>
-    {
-        if (gmButton.dataset.active === Constants.TRUE)
-        {
-            gmButton.dataset.active = Constants.FALSE;
-            gmButton.classList.remove('options-active');
-        }
-        else
-        {
-            gmButton.dataset.active = Constants.TRUE;
-            gmButton.classList.add('options-active');
-        }
-    };
+        const inputButton = document.createElement('input');
+        inputButton.type = "text";
+        inputButton.placeholder = "Custom Roll";
+        inputButton.classList.add('input-button');
 
-    optionsContainer.appendChild(gmButton);
-    optionsContainer.appendChild(selfButton);
-
-    const dFourButton = createDiceButton('d4Button', '/dice-four.svg', "Add a Four-Sided Dice");
-    const dSixButton = createDiceButton('d6Button', '/dice-six.svg', "Add a Six-Sided Dice");
-    const dEightButton = createDiceButton('d8Button', '/dice-eight.svg',"Add a Eight-Sided Dice");
-    const dTenButton = createDiceButton('d10Button', '/dice-ten.svg',"Add a Ten-Sided Dice");
-    const dTwelveButton = createDiceButton('d12Button', '/dice-twelve.svg',"Add a Twelve-Sided Dice");
-    const dTwentyButton = createDiceButton('d20Button', '/dice-twenty.svg',"Add a Twenty-Sided Dice");
-    const dHundredButton = createDiceButton('d100Button', '/dice-hundred.svg',"Add a Percentile and Ten-Sided Dice");
-
-    const diceButton = document.createElement('input');
-    diceButton.id = "diceWindowOpen";
-    diceButton.type = 'image';
-    diceButton.src = diceOpenImg;
-    diceButton.classList.add("dice-button");
-    diceButton.value = Constants.CLOSE;
-    diceButton.onclick = async () =>
-    {
-        if (diceButton.value === Constants.CLOSE)
+        const selfButton = document.createElement('input');
+        selfButton.id = "manualRollSelfButton";
+        selfButton.type = 'button';
+        selfButton.classList.add('options-button');
+        selfButton.classList.add('options-hover');
+        selfButton.value = 'Self';
+        selfButton.dataset.active = Constants.FALSE;
+        selfButton.onclick = () => 
         {
-            diceButton.src = diceCloseImg;
-            diceButton.value = Constants.OPEN;
-            diceButton.hidden = true;
-            await OBR.popover.setHeight(Constants.EXTENSIONDICECONTROLLERID, 475);
-            ToggleDiceDisplay();
-            diceButton.hidden = false;
-            gmButton.classList.add('options-hover');
-            selfButton.classList.add('options-hover');
-        }
-        else
-        {
-            const rolls: string[] = [];
-            for (const [buttonId, count] of Object.entries(rollDict))
+            if (selfButton.dataset.active === Constants.TRUE)
             {
-                const diceType = buttonId.replace('Button', '');
-                rolls.push(`${count}${diceType}`);
+                selfButton.dataset.active = Constants.FALSE;
+                selfButton.classList.remove('options-active');
             }
-
-            if (rolls.length !== 0)
+            else
             {
-                const rollEquation = rolls.join('+');
+                selfButton.dataset.active = Constants.TRUE;
+                selfButton.classList.add('options-active');
+            }
+        };
+
+        const gmButton = document.createElement('input');
+        gmButton.id = "manualRollGMButton";
+        gmButton.type = 'button';
+        gmButton.classList.add('options-button');
+        gmButton.classList.add('options-hover');
+        gmButton.value = 'GM';
+        gmButton.onclick = () =>
+        {
+            if (gmButton.dataset.active === Constants.TRUE)
+            {
+                gmButton.dataset.active = Constants.FALSE;
+                gmButton.classList.remove('options-active');
+            }
+            else
+            {
+                gmButton.dataset.active = Constants.TRUE;
+                gmButton.classList.add('options-active');
+            }
+        };
+
+        const rollButton = document.createElement('input');
+        rollButton.id = 'rollButton';
+        rollButton.type = 'image';
+        rollButton.src = '/dice-twenty.svg';
+        rollButton.onclick = async () =>
+        {
+            await SendRoll();
+        };
+        inputButton.onkeydown = async (e) =>
+        {
+            if (e.key === 'Enter') await SendRoll();
+        };
+
+        manualRollContainer.prepend(inputButton);
+        viewToggleContainer.appendChild(rollButton);
+        viewToggleContainer.appendChild(selfButton);
+        viewToggleContainer.appendChild(gmButton);
+
+        async function SendRoll()
+        {
+            const notation = inputButton.value;
+            if (notation.length > 0)
+            {
                 const selfview = selfButton.dataset.active;
                 const gmview = gmButton.dataset.active;
-
                 let viewedBy = "ALL";
                 if (selfview === "TRUE") viewedBy = "SELF";
                 if (gmview === "TRUE") viewedBy = "GM";
@@ -176,79 +147,96 @@ OBR.onReady(async () =>
                 const now = new Date().toISOString();
                 metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] // metadata[`com.battle-system.bones/metadata_bonesroll`]
                     = {
-                        notation: rollEquation, //"8d6!",
+                        notation: notation, //"8d6!",
                         created: now, // new Date().toISOString()
-                        senderName: userName, // Name to display for Roll
-                        senderId: userId, // PlayerId | Self-Tracking-Number
+                        senderName: BSCACHE.playerName, // Name to display for Roll
+                        senderId: BSCACHE.playerId, // PlayerId | Self-Tracking-Number
                         viewers: viewedBy // "ALL" | "GM" | "SELF"
                     } as IBonesRoll;
 
                 await OBR.player.setMetadata(metadata);
             }
-
-            diceButton.src = diceOpenImg;
-            diceButton.value = Constants.CLOSE;
-            ToggleDiceDisplay();
-            setTimeout(async () =>
-            {
-                await OBR.popover.setHeight(Constants.EXTENSIONDICECONTROLLERID, 54);
-            }, 500);
-        }
-    };
-    diceButton.oncontextmenu = async (e) =>
-    {
-        e.stopPropagation();
-        e.preventDefault();
-        if (diceButton.value === Constants.OPEN)
-        {
-            diceButton.src = diceOpenImg;
-            diceButton.value = Constants.CLOSE;
-            ToggleDiceDisplay();
-            setTimeout(async () =>
-            {
-                await OBR.popover.setHeight(Constants.EXTENSIONDICECONTROLLERID, 54);
-            }, 500);
-        }
-    };
-
-    Constants.BONESDICECONTROLLER.appendChild(optionsContainer);
-    Constants.BONESDICECONTROLLER.appendChild(dFourButton);
-    Constants.BONESDICECONTROLLER.appendChild(dSixButton);
-    Constants.BONESDICECONTROLLER.appendChild(dEightButton);
-    Constants.BONESDICECONTROLLER.appendChild(dTenButton);
-    Constants.BONESDICECONTROLLER.appendChild(dHundredButton);
-    Constants.BONESDICECONTROLLER.appendChild(dTwelveButton);
-    Constants.BONESDICECONTROLLER.appendChild(dTwentyButton);
-    Constants.BONESCONTROLLER.appendChild(diceButton);
-
-    function ToggleDiceDisplay()
-    {
-        if (Constants.BONESDICECONTROLLER.classList.contains('hidden'))
-        {
-            Constants.BONESDICECONTROLLER.classList.remove('hidden');
-            Constants.BONESDICECONTROLLER.style.height = '412px';
-        } else
-        {
-            Constants.BONESDICECONTROLLER.classList.add('hidden');
-            Constants.BONESDICECONTROLLER.style.height = '0';
-            rollDict = {};
-            resetDiceCounters();
+            inputButton.value = "";
         }
     }
 
-    function resetDiceCounters()
+    function CreateColorSelect()
     {
-        const diceCounters = document.querySelectorAll<HTMLLabelElement>('.dice-counter');
-        gmButton.dataset.active = Constants.FALSE;
-        gmButton.classList.remove('options-active');
-        gmButton.classList.remove('options-hover');
-        selfButton.dataset.active = Constants.FALSE;
-        selfButton.classList.remove('options-active');
-        selfButton.classList.remove('options-hover');
-        diceCounters.forEach((counter) =>
+        let debouncer: ReturnType<typeof setTimeout>;
+
+        const colorisContainer = document.getElementById('colorisContainer')!;
+
+        const colorInput = document.createElement('input');
+        colorInput.type = "text";
+        colorInput.classList.add('coloris');
+        colorInput.id = "diceColoris";
+        colorInput.value = BSCACHE.playerDiceColor;
+        colorInput.maxLength = 7;
+        colorInput.oninput = async (event: Event) =>
         {
-            counter.hidden = true;
-            counter.innerText = '0';
+            if (!event || !event.target) return;
+            const target = event.target as HTMLInputElement;
+
+            clearTimeout(debouncer);
+
+            // Debounce this input to avoid hitting OBR rate limit
+            debouncer = setTimeout(async () =>
+            {
+                const hexTest = /#[a-f0-9]{6}/
+                if (hexTest.test(target.value))
+                {
+                    await OBR.room.setMetadata({ [Constants.DICECOLORSETTING + BSCACHE.playerId]: target.value });
+                }
+            }, 400);
+
+        };
+        colorisContainer.appendChild(colorInput);
+        console.log(BSCACHE.theme.mode);
+        Coloris.init();
+        Coloris({
+            alpha: false,
+            theme: 'polaroid',
+            closeButton: true,
+            themeMode: BSCACHE.theme.mode === "DARK" ? "dark" : "light",
+            el: "#diceColoris",
         });
+    }
+
+    function CreateTextureSelect()
+    {
+        const selectContainer = document.getElementById('selectContainer')!;
+
+        const selector = <HTMLSelectElement>document.createElement('select');
+        selector.id = "textureSelect";
+
+        const textures = [
+            { text: "Default", value: "default" },
+            { text: "D.o.R", value: "diceOfRolling" },
+            { text: "Gemstone", value: "gemstone" },
+            { text: "Marble", value: "gemstoneMarble" },
+            { text: "Rocky", value: "rock" },
+            { text: "Rusty", value: "rust" },
+            { text: "Smooth", value: "smooth" },
+            { text: "Wood", value: "wooden" },
+        ];
+
+        textures.forEach((texture) =>
+        {
+            const option = document.createElement("option");
+            option.setAttribute('value', texture.value);
+            const text = document.createTextNode(texture.text);
+            option.appendChild(text);
+
+            selector.appendChild(option);
+        });
+        selector.value = BSCACHE.playerDiceTexture;
+
+        selector.onchange = async (event) =>
+        {
+            const target = event.currentTarget as HTMLSelectElement;
+            await OBR.room.setMetadata({ [Constants.DICETEXTURESETTING + BSCACHE.playerId]: target.value });
+        }
+        selectContainer.appendChild(selector);
+
     }
 });
