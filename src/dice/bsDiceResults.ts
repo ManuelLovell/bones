@@ -32,9 +32,16 @@ export function GetResults(data: ResultsData): string
         let sides = roll.die || roll.sides || 'fate';
         if (i !== 0)
         {
-            const operator = data.ops[i - 1];
-            const opsString = operator === "-" ? '-' : '';
-            resultString += `, ${opsString}`;
+            if (data.ops)
+            {
+                const operator = data.ops[i - 1];
+                const opsString = operator === "-" ? '-' : '';
+                resultString += `, ${opsString}`;
+            }
+            else
+            {
+                resultString += `, `;
+            }
         }
 
         if (roll.success !== undefined && roll.success !== null)
