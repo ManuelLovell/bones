@@ -58,8 +58,16 @@ OBR.onReady(async () =>
             }
 
             const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
-            if (ticks === 0) diceButton.src = diceCloseImg;
-            else diceButton.src = diceGoImg;
+            if (ticks === 0)
+            {
+                diceButton.src = diceCloseImg;
+                diceButton.classList.remove("pulse");
+            }
+            else
+            {
+                diceButton.src = diceGoImg;
+                diceButton.classList.add("pulse");
+            }
         };
         button.oncontextmenu = (e) => 
         {
@@ -78,8 +86,16 @@ OBR.onReady(async () =>
             }
 
             const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
-            if (ticks === 0) diceButton.src = diceCloseImg;
-            else diceButton.src = diceGoImg;
+            if (ticks === 0)
+            {
+                diceButton.src = diceCloseImg;
+                diceButton.classList.remove("pulse");
+            }
+            else
+            {
+                diceButton.src = diceGoImg;
+                diceButton.classList.add("pulse");
+            }
         };
 
         const container = document.createElement('div');
@@ -239,6 +255,7 @@ OBR.onReady(async () =>
         rollDict = {};
         const diceCounters = document.querySelectorAll<HTMLLabelElement>('.dice-counter');
         diceButton.src = diceCloseImg;
+        diceButton.classList.remove("pulse");
         gmButton.dataset.active = Constants.FALSE;
         gmButton.classList.remove('options-active');
         gmButton.classList.remove('options-hover');
@@ -257,5 +274,6 @@ OBR.onReady(async () =>
     {
         diceButton.disabled = !ready;
         diceButton.src = ready ? diceCloseImg : diceWaitingImg;
+        diceButton.classList.remove("pulse");
     });
 });

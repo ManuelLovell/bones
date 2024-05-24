@@ -1,6 +1,6 @@
 export function GetResults(data: ResultsData): string
 {
-    let rolls: Roll[] = [];
+    let rolls: any[] = [];
     if (data.rolls && !Array.isArray(data.rolls))
     {
         rolls = Object.values(data.rolls).map((roll) => roll);
@@ -32,7 +32,9 @@ export function GetResults(data: ResultsData): string
         let sides = roll.die || roll.sides || 'fate';
         if (i !== 0)
         {
-            resultString += ', ';
+            const operator = data.ops[i - 1];
+            const opsString = operator === "-" ? '-' : '';
+            resultString += `, ${opsString}`;
         }
 
         if (roll.success !== undefined && roll.success !== null)
@@ -85,6 +87,22 @@ export function GetResults(data: ResultsData): string
 
         resultString += val;
     });
+
+    // Process modifiers
+    let modifiers: string[] = [];
+    data.dice?.forEach(die =>
+    {
+        if (die.type === 'number' && die.value !== undefined)
+        {
+            modifiers.push((die.value > 0 ? '+' : '') + die.value);
+        }
+    });
+
+    if (modifiers.length > 0)
+    {
+        resultString += ` (${modifiers.join(' ')})`
+    }
+
     resultString += ` = <strong>${total}</strong>`;
 
     return resultString;

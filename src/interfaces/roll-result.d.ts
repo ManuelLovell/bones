@@ -47,21 +47,66 @@ interface IBRPRoll
     fumble?: number;
 }
 
+interface Dice
+{
+    count?: {
+        type: string;
+        value: number;
+        success: any;
+        successes: number;
+        failures: number;
+        valid: boolean;
+        order: number;
+    };
+    die?: {
+        type: string;
+        value: number;
+        success: any;
+        successes: number;
+        failures: number;
+        valid: boolean;
+        order: number;
+    };
+    rolls?: Roll[];
+    success: any;
+    successes: number;
+    failures: number;
+    type: string;
+    valid: boolean;
+    value: number;
+    order: number;
+    matched?: boolean;
+}
+
 interface ResultsData
 {
-    rolls: Roll[] | { [key: string]: Roll };
-    value?: number;
+    dice: Dice[];
+    ops: string[];
+    success: any;
+    successes: number;
+    failures: number;
+    type: string;
+    valid: boolean;
+    value: number;
+    order: number;
+    rolls: any;
 }
 
 interface Roll
 {
+    critical: any;
+    die: number;
+    matched: boolean;
+    order: number;
+    roll: number;
+    success: any;
+    successes: number;
+    failures: number;
+    type: string;
+    valid: boolean;
+    value: number;
     die?: number;
     sides?: number;
-    success?: boolean | null;
-    failures?: number;
-    value?: number;
-    modifier?: number;
-    critical?: string;
     drop?: boolean;
     reroll?: boolean;
     explode?: boolean;

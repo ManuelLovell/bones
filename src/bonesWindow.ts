@@ -84,7 +84,7 @@ OBR.onReady(async () =>
 
         setTimeout(async () =>
         {
-            await OBR.popover.close(Constants.EXTENSIONDICEWINDOWID);
+            await OBR.modal.close(Constants.EXTENSIONDICEWINDOWID);
         }, 2000);
     }
 
@@ -117,7 +117,7 @@ OBR.onReady(async () =>
                 {
                     // If we can't parse the formula, just leave so it doesnt block the screen.
                     await OBR.notification.show("Unable to Parse Dice Notation", "ERROR");
-                    await OBR.popover.close(Constants.EXTENSIONDICEWINDOWID);
+                    await OBR.modal.close(Constants.EXTENSIONDICEWINDOWID);
                 }
             }
         });
@@ -131,7 +131,7 @@ OBR.onReady(async () =>
     {
         AUTOTIMER = setTimeout(async () =>
         {
-            await OBR.popover.close(Constants.EXTENSIONDICEWINDOWID);
+            await OBR.modal.close(Constants.EXTENSIONDICEWINDOWID);
         }, 10000);
     }
 });

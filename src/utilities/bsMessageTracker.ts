@@ -46,23 +46,14 @@ export class MessageTracker
 
                 const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
                 const VIEWPORTWIDTH = await OBR.viewport.getWidth();
-                await OBR.popover.open({
+                await OBR.modal.open({
                     id: Constants.EXTENSIONDICEWINDOWID,
                     url: '/dicewindow.html',
-                    height: VIEWPORTHEIGHT - 50,
+                    height: VIEWPORTHEIGHT - 100,
                     width: VIEWPORTWIDTH - 50,
-                    anchorPosition: { top: 25, left: 25 },
-                    anchorReference: "POSITION",
-                    anchorOrigin: {
-                        vertical: "TOP",
-                        horizontal: "LEFT",
-                    },
-                    transformOrigin: {
-                        vertical: "TOP",
-                        horizontal: "LEFT",
-                    },
-                    disableClickAway: true,
-                    hidePaper: true
+                    hidePaper: true,
+                    hideBackdrop: true,
+                    disablePointerEvents: true,
                 });
             }
         }
