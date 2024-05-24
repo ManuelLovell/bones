@@ -1,5 +1,11 @@
-import{O as e,C as o}from"./bsConstants-mb-QB5VY.js";const n=document.querySelector("#bs-whatsnew"),s=document.querySelector("#bs-whatsnew-notes");n.innerHTML=`
+import{O as e,C as o}from"./bsConstants-ro0LkXpK.js";const n=document.querySelector("#bs-whatsnew"),s=document.querySelector("#bs-whatsnew-notes");n.innerHTML=`
   <div id="newsContainer">
+    <h1>Bones! 5/24</h1>
+    </br> Hello again! Some changes/fixes.
+    <li> You should now be able to 'click through' the dice while they are rolling.  This is a layering trade-off, because it means certain extensions/pop-ups might obscure the dice. (Meaning they might slide UNDER the windows)
+    <li> Updated the parsing HTML to account better for negative numbers. (So 1d4-1d6 should be seen accurately.)
+    <li> Updated the parsing HTML to visibly show modifiers on the formula. (So 1d4+6 should be seen accurately.)
+    <li> The 'roll' button now pulses to show that it's changed to a 'click me' type of button.  Someone mentioned they couldn't figure out how to roll dice.. so.. this one's for you.
     <h1>Bones! 2/5</h1>
     </br> You'll notice.. everything got moved around.  In order to get approved for the store I had to compromise on some things that couldn't be achieved.
     </br> All in all, it should still function the same.  But now you can drag the Action popover wherever you want, and rolling doesn't collapse the window.
