@@ -9,6 +9,8 @@ const footer = document.querySelector<HTMLElement>('#bs-whatsnew-notes')!;
 whatsnew.innerHTML = `
   <div id="newsContainer">
     <h1>Bones! 5/24</h1>
+    </br> Minor update to fix how negative modifiers are shown in the log (1d20-5, for example was showing as a positive in the roll text).
+    <h1>Bones! 5/24</h1>
     </br> Hello again! Some changes/fixes.
     <li> You should now be able to 'click through' the dice while they are rolling.  This is a layering trade-off, because it means certain extensions/pop-ups might obscure the dice. (Meaning they might slide UNDER the windows)
     <li> Updated the parsing HTML to account better for negative numbers. (So 1d4-1d6 should be seen accurately.)

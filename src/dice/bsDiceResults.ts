@@ -97,17 +97,25 @@ export function GetResults(data: ResultsData): string
 
     // Process modifiers
     let modifiers: string[] = [];
-    data.dice?.forEach(die =>
+    if (data.dice && data.dice.length > 1)
     {
-        if (die.type === 'number' && die.value !== undefined)
+        for (let index = 0; index < data.dice.length; index++)
         {
-            modifiers.push((die.value > 0 ? '+' : '') + die.value);
+            const diceM = data.dice[index];
+            if (data.ops && data.ops.length > 0)
+            {
+                const modifier = data.ops[index - 1];
+                if (diceM && diceM.type === 'number' && diceM.value !== undefined && modifier)
+                {
+                    modifiers.push(modifier + diceM.value.toString());
+                }
+            }
         }
-    });
+    }
 
     if (modifiers.length > 0)
     {
-        resultString += ` (${modifiers.join(' ')})`
+        resultString += `, (${modifiers.join(' ')})`
     }
 
     resultString += ` = <strong>${total}</strong>`;
