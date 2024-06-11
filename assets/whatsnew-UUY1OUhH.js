@@ -1,5 +1,7 @@
-import{O as e,C as o}from"./bsConstants-ro0LkXpK.js";const n=document.querySelector("#bs-whatsnew"),s=document.querySelector("#bs-whatsnew-notes");n.innerHTML=`
+import{O as e,C as o}from"./bsConstants-uz3BotTD.js";const n=document.querySelector("#bs-whatsnew"),s=document.querySelector("#bs-whatsnew-notes");n.innerHTML=`
   <div id="newsContainer">
+    <h1>Bones! 5/24</h1>
+    </br> Minor update to fix how negative modifiers are shown in the log (1d20-5, for example was showing as a positive in the roll text).
     <h1>Bones! 5/24</h1>
     </br> Hello again! Some changes/fixes.
     <li> You should now be able to 'click through' the dice while they are rolling.  This is a layering trade-off, because it means certain extensions/pop-ups might obscure the dice. (Meaning they might slide UNDER the windows)
