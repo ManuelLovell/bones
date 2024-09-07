@@ -50,14 +50,26 @@
     }
 }
 
-body {
-    display: flex;
-    flex-direction: column-reverse;
-    padding-left: 2px;
+html {
     height: 100%;
-    width: 100%;
-    margin: 0;
+}
+
+body {
+    height: 100%;
     overflow: hidden;
+    margin: 6px;
+}
+
+#bones-controller-dice {
+    display: flex;
+    flex-direction: column;
+    height: 98%;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--OBR-Purple-Select) transparent;
+    padding-right: 3px;
 }
 
 .options-container {
@@ -104,22 +116,6 @@ body {
     transform: translateY(-100%);
 }
 
-#bones-controller-body-app {
-    position: absolute;
-    bottom: 0;
-}
-
-#bones-controller-dice {
-    transform: translateY(0%);
-    position: absolute;
-    bottom: 54px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transition: height 0.5s ease-in-out;
-    transform-origin: bottom;
-}
-
 .label {
     background: var(--OBR-Purple-Select);
     border-radius: 50%;
@@ -141,7 +137,7 @@ body {
 }
 
 .pulse {
-    background-color:  var(--OBR-Purple-Select-Transparent);
+    background-color: var(--OBR-Purple-Select-Transparent);
     animation: pulse 2s infinite;
 }
 

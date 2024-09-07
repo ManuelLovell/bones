@@ -82,29 +82,31 @@
 
 /* MANUAL ROLL */
 #manualRollContainer {
-    display:flex;
+    display: flex;
 }
 
 #viewToggleContainer {
     width: 50%;
     display: flex;
-    justify-content:space-between;
+    justify-content: space-between;
 }
-#rollButton{
-    height:95%;
-    width:25px;
+
+#rollButton {
+    height: 95%;
+    width: 25px;
     background-color: var(--OBR-dark-blue-transparent);
     border-radius: 5px;
     border: 1px solid var(--OBR-Purple-Select);
     padding: 0 6px 0 6px;
 }
+
 .input-button {
     background-color: var(--OBR-dark-blue-transparent);
     border-radius: 5px;
     color: var(--OBR-font);
     border: 1px solid var(--OBR-font);
     width: 40%;
-    margin-right:6px;
+    margin-right: 6px;
     height: 2em;
 }
 
@@ -115,7 +117,7 @@
     background-color: var(--OBR-dark-blue-trans);
     border: 1px solid var(--OBR-Purple-Select);
     border-radius: 6px;
-    height:100%;
+    height: 100%;
 }
 
 .options-hover:hover {
@@ -127,15 +129,16 @@
 }
 
 /* COLORIS */
-#colorisContainer {
+#frontColorisContainer,
+#backColorisContainer {
     width: 25%;
-    height: 3em;
+    height: 1.5em;
     margin-top: 1px;
 }
 
 .colorisContainer {
     width: 100%;
-    height: 3em;
+    height: 1.5em;
     margin-bottom: 5px;
     border-radius: 5px;
     cursor: pointer;
@@ -144,7 +147,7 @@
 #diceColoris {
     cursor: pointer;
     width: 100%;
-    height: 3em;
+    height: 1.5em;
     padding: 0 10px;
     border: 1px solid var(--OBR-font);
     ;
@@ -187,7 +190,7 @@ select::-ms-expand {
     position: relative;
     display: flex;
     width: 70%;
-    height: 3em;
+    height: 1.5em;
     border-radius: .25em;
     overflow: hidden;
     border: 1px solid var(--OBR-font);
@@ -199,7 +202,7 @@ select::-ms-expand {
     position: absolute;
     top: 0;
     right: 0;
-    padding: 1em;
+    padding-right: 4px;
     background-color: var(--OBR-offset-background);
     transition: .25s all ease;
     pointer-events: none;

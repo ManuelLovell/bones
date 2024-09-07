@@ -14,10 +14,15 @@ OBR.onReady(async () =>
     const defaultColor = await OBR.player.getColor();
     const diceColor = roomMetadata[Constants.DICECOLORSETTING + defaultId] as string;
     let diceTexture = roomMetadata[Constants.DICETEXTURESETTING + defaultId] as string;
+    let diceZoom = roomMetadata[Constants.DICEZOOMSETTING + defaultId] as number;
 
     if (!Constants.DEFAULTTEXTURES.includes(diceTexture))
     {
         diceTexture = "default";
+    }
+    if (!diceZoom)
+    {
+        diceZoom = 4;
     }
 
     let defaultViewers: "GM" | "SELF" | "ALL" = "SELF";
@@ -39,7 +44,7 @@ OBR.onReady(async () =>
             spinForce: 5,
             gravity: 2,
             lightIntensity: 1,
-            scale: 4,
+            scale: diceZoom, // Was 4
             enableShadows: true,
             shadowTransparency: .5,
             theme: diceTexture ?? "default",

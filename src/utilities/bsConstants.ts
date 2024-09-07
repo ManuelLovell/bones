@@ -13,7 +13,9 @@ export class Constants
     static TRUE = "TRUE";
     static FALSE = "FALSE";
 
+    static DICEZOOMSETTING = `${Constants.EXTENSIONID}/zoom_`;
     static DICECOLORSETTING = `${Constants.EXTENSIONID}/color_`;
+    static FRONTDICECOLORSETTING = `${Constants.EXTENSIONID}/fcolor_`;
     static DICETEXTURESETTING = `${Constants.EXTENSIONID}/texture_`;
 
     static NORMALDICE = /^[0-9+d]+$/;
@@ -25,7 +27,6 @@ export class Constants
 
     static BONESENTRY = document.querySelector<HTMLDivElement>('#bones-main-body-app') as HTMLDivElement;
     static BONESWINDOW = document.querySelector<HTMLDivElement>('#bones-window-body-app') as HTMLDivElement;
-    static BONESCONTROLLER = document.querySelector<HTMLDivElement>('#bones-controller-body-app') as HTMLDivElement;
     static BONESDICECONTROLLER = document.querySelector<HTMLDivElement>('#bones-controller-dice') as HTMLDivElement;
     static BONESNOTIFICATIONS = document.querySelector<HTMLDivElement>('#bones-notify-body-app') as HTMLDivElement;
 

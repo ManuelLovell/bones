@@ -8,6 +8,14 @@ const footer = document.querySelector<HTMLElement>('#bs-whatsnew-notes')!;
 
 whatsnew.innerHTML = `
   <div id="newsContainer">
+    <h1>Bones! 9/7</h1>
+    Just some accessibility updates today.
+    </br> Added a dice zoom option, so you can have mondo-dice. Or min-dice if you're insane.
+    </br> I wanted to add front-coloring in (like Bones) but I'll have to tinker some more to see if that's possible with this dice package.
+    </br> Also some styling updates for people using zoomed-in displays, or have an arrow vertical screen.  The scrollbar/scrolling should be available now in case.
+    </br> I do see that Genesys dice are available for the package now, so I'll probably look into getting those configured soon.
+    </br> Enjoy!
+    </br>
     <h1>Bones! 5/24</h1>
     </br> Minor update to fix how negative modifiers are shown in the log (1d20-5, for example was showing as a positive in the roll text).
     <h1>Bones! 5/24</h1>

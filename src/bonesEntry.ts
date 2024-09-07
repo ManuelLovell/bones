@@ -248,7 +248,7 @@ OBR.onReady(async () =>
     Constants.BONESDICECONTROLLER.appendChild(dHundredButton);
     Constants.BONESDICECONTROLLER.appendChild(dTwelveButton);
     Constants.BONESDICECONTROLLER.appendChild(dTwentyButton);
-    Constants.BONESCONTROLLER.appendChild(diceButton);
+    Constants.BONESDICECONTROLLER.appendChild(diceButton);
 
     function ResetDiceCounters()
     {

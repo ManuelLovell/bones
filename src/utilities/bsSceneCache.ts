@@ -24,7 +24,9 @@ class BSCache
     playerRole: "GM" | "PLAYER";
 
     playerDiceColor: string;
+    playerFrontDiceColor: string;
     playerDiceTexture: string;
+    playerDiceZoom: number;
 
     party: Player[];
 
@@ -71,6 +73,8 @@ class BSCache
 
         this.playerDiceTexture = "skulls";
         this.playerDiceColor = "#ff0000";
+        this.playerFrontDiceColor = "#FFFFFF";
+        this.playerDiceZoom = 4;
 
         this.caches = caches;
 
@@ -136,8 +140,10 @@ class BSCache
         {
             this.roomMetadata = await OBR.room.getMetadata();
             this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff0000";
+            this.playerDiceZoom = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId] as number ?? 4;
+            this.playerFrontDiceColor = this.roomMetadata[Constants.FRONTDICECOLORSETTING + this.playerId] as string ?? "#FFFFFF";
             this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "default";
-            
+
             if (!Constants.DEFAULTTEXTURES.includes(this.playerDiceTexture))
             {
                 this.playerDiceTexture = "default";
@@ -306,10 +312,20 @@ class BSCache
     public async OnRoomMetadataChange()
     {
         const colorCheck = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId];
+        const zoomCheck = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId];
+        const frontColorCheck = this.roomMetadata[Constants.FRONTDICECOLORSETTING + this.playerId];
         const textureCheck = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId];
         if (colorCheck)
         {
             this.playerDiceColor = colorCheck as string;
+        }
+        if (frontColorCheck)
+        {
+            this.playerFrontDiceColor = frontColorCheck as string;
+        }
+        if (zoomCheck)
+        {
+            this.playerDiceZoom = zoomCheck as number;
         }
         if (textureCheck)
         {

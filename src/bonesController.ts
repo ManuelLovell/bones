@@ -7,13 +7,19 @@ import "@melloware/coloris/dist/coloris.css";
 import './style.css'
 import './dice/dicenotify.css'
 
+//Can't choose front dice color currently.
+//<div id="frontColorisContainer" class='coloris-container full'></div>
 Constants.BONESENTRY.innerHTML =
     `    
     <div class="header"><span style="float:left;" id="optionsToggle">▼</span>Dice Options</div><div id="whatsNew"></div>
     <div id="optionsContainer">
         <div style="display:flex; justify-content:space-between;">
             <div id="selectContainer" class="select"></div>
-            <div id="colorisContainer" class='coloris-container full'></div>
+            
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <div id="zoomContainer" class="select"></div>
+            <div id="backColorisContainer" class='coloris-container full'></div>
         </div>
     </div>
     <div class="header"><span style="float:left;" id="rollToggle">▼</span>Dice Log</div>
@@ -30,6 +36,7 @@ OBR.onReady(async () =>
 
     CreateColorSelect();
     CreateTextureSelect();
+    CreateZoomSelect();
     CreateManualRollArea();
 
     const whatsNewContainer = document.getElementById("whatsNew")!;
@@ -164,15 +171,41 @@ OBR.onReady(async () =>
     {
         let debouncer: ReturnType<typeof setTimeout>;
 
-        const colorisContainer = document.getElementById('colorisContainer')!;
+        //const frontColorisContainer = document.getElementById('frontColorisContainer')!;
+        const backColorisContainer = document.getElementById('backColorisContainer')!;
 
-        const colorInput = document.createElement('input');
-        colorInput.type = "text";
-        colorInput.classList.add('coloris');
-        colorInput.id = "diceColoris";
-        colorInput.value = BSCACHE.playerDiceColor;
-        colorInput.maxLength = 7;
-        colorInput.oninput = async (event: Event) =>
+        // const fColorInput = document.createElement('input');
+        // fColorInput.type = "text";
+        // fColorInput.classList.add('coloris');
+        // fColorInput.id = "diceColoris";
+        // fColorInput.value = BSCACHE.playerFrontDiceColor;
+        // fColorInput.maxLength = 7;
+        // fColorInput.oninput = async (event: Event) =>
+        // {
+        //     if (!event || !event.target) return;
+        //     const target = event.target as HTMLInputElement;
+
+        //     clearTimeout(debouncer);
+
+        //     // Debounce this input to avoid hitting OBR rate limit
+        //     debouncer = setTimeout(async () =>
+        //     {
+        //         const hexTest = /#[a-f0-9]{6}/
+        //         if (hexTest.test(target.value))
+        //         {
+        //             await OBR.room.setMetadata({ [Constants.FRONTDICECOLORSETTING + BSCACHE.playerId]: target.value });
+        //         }
+        //     }, 400);
+
+        // };
+
+        const bColorInput = document.createElement('input');
+        bColorInput.type = "text";
+        bColorInput.classList.add('coloris');
+        bColorInput.id = "diceColoris";
+        bColorInput.value = BSCACHE.playerDiceColor;
+        bColorInput.maxLength = 7;
+        bColorInput.oninput = async (event: Event) =>
         {
             if (!event || !event.target) return;
             const target = event.target as HTMLInputElement;
@@ -190,8 +223,8 @@ OBR.onReady(async () =>
             }, 400);
 
         };
-        colorisContainer.appendChild(colorInput);
-        console.log(BSCACHE.theme.mode);
+        //frontColorisContainer.appendChild(fColorInput);
+        backColorisContainer.appendChild(bColorInput);
         Coloris.init();
         Coloris({
             alpha: false,
@@ -200,6 +233,42 @@ OBR.onReady(async () =>
             themeMode: BSCACHE.theme.mode === "DARK" ? "dark" : "light",
             el: "#diceColoris",
         });
+    }
+
+    function CreateZoomSelect()
+    {
+        const zoomContainer = document.getElementById('zoomContainer')!;
+        const selector = <HTMLSelectElement>document.createElement('select');
+        selector.id = "zoomSelect";
+
+        const textures = [
+            { text: "25%", value: "1" },
+            { text: "50%", value: "2" },
+            { text: "75%", value: "3" },
+            { text: "100%", value: "4" },
+            { text: "125%", value: "5" },
+            { text: "150%", value: "6" },
+            { text: "175%", value: "7" },
+            { text: "200%", value: "8" },
+        ];
+
+        textures.forEach((texture) =>
+        {
+            const option = document.createElement("option");
+            option.setAttribute('value', texture.value);
+            const text = document.createTextNode(texture.text);
+            option.appendChild(text);
+
+            selector.appendChild(option);
+        });
+        selector.value = BSCACHE.playerDiceZoom.toString();
+
+        selector.onchange = async (event) =>
+        {
+            const target = event.currentTarget as HTMLSelectElement;
+            await OBR.room.setMetadata({ [Constants.DICEZOOMSETTING + BSCACHE.playerId]: parseInt(target.value) });
+        }
+        zoomContainer.appendChild(selector);
     }
 
     function CreateTextureSelect()
@@ -237,6 +306,5 @@ OBR.onReady(async () =>
             await OBR.room.setMetadata({ [Constants.DICETEXTURESETTING + BSCACHE.playerId]: target.value });
         }
         selectContainer.appendChild(selector);
-
     }
 });
