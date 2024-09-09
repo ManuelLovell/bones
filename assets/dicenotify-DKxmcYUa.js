@@ -1,4 +1,4 @@
-import{O as c,C as e}from"./bsConstants-anvcUbPb.js";/* empty css                   */c.onReady(async()=>{const d=window.location.search,t=new URLSearchParams(d),a=decodeURIComponent(t.get("sender")),r=decodeURIComponent(t.get("message")),s=decodeURIComponent(t.get("color")),i=decodeURIComponent(t.get("queue"));e.BONESNOTIFICATIONS.innerHTML=`
+import{O as c,C as e}from"./bsConstants-O-uRKwz7.js";/* empty css                   */c.onReady(async()=>{const d=window.location.search,t=new URLSearchParams(d),a=decodeURIComponent(t.get("sender")),r=decodeURIComponent(t.get("message")),s=decodeURIComponent(t.get("color")),i=decodeURIComponent(t.get("queue"));e.BONESNOTIFICATIONS.innerHTML=`
         <div style="color:${s};" id="diceSender">${a}</div>
         <div id="diceContainer">
             <div id="diceImage">

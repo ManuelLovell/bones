@@ -1,4 +1,4 @@
-import{O as e,C as t}from"./bsConstants-anvcUbPb.js";const s=document.querySelector("#bs-whatsnew"),n=document.querySelector("#bs-whatsnew-notes");s.innerHTML=`
+import{O as e,C as t}from"./bsConstants-O-uRKwz7.js";const s=document.querySelector("#bs-whatsnew"),n=document.querySelector("#bs-whatsnew-notes");s.innerHTML=`
   <div id="newsContainer">
     <h1>Bones! 9/7</h1>
     Just some accessibility updates today.
