@@ -42,6 +42,7 @@ class BSCache
 
     theme: any;
 
+    USER_REGISTERED: boolean;
     caches: string[];
 
     //handlers
@@ -76,6 +77,7 @@ class BSCache
         this.playerFrontDiceColor = "#FFFFFF";
         this.playerDiceZoom = 4;
 
+        this.USER_REGISTERED = false;
         this.caches = caches;
 
         // Large singular updates to sceneItems can cause the resulting onItemsChange to proc multiple times, at the same time
@@ -149,6 +151,7 @@ class BSCache
                 this.playerDiceTexture = "default";
             }
         }
+        await this.CheckRegistration();
     }
 
     public KillHandlers()
@@ -336,6 +339,48 @@ class BSCache
     public async OnThemeChange(theme: Theme)
     {
         Utilities.SetThemeMode(theme, document);
+    }
+    
+    public async CheckRegistration()
+    {
+        try
+        {
+            const debug = window.location.origin.includes("localhost") ? "eternaldream" : "";
+            const userid = {
+                owlbearid: BSCACHE.playerId
+            };
+
+            const requestOptions = {
+                method: "POST",
+                headers: new Headers({
+                    "Content-Type": "application/json",
+                    "Authorization": Constants.ANONAUTH,
+                    "x-manuel": debug
+                }),
+                body: JSON.stringify(userid),
+            };
+            const response = await fetch(Constants.CHECKREGISTRATION, requestOptions);
+
+            if (!response.ok)
+            {
+                const errorData = await response.json();
+                // Handle error data
+                console.error("Error:", errorData);
+                return;
+            }
+            const data = await response.json();
+            if (data.Data === "OK")
+            {
+                this.USER_REGISTERED = true;
+                console.log("Connected");
+            }
+            else console.log("Not Registered");
+        }
+        catch (error)
+        {
+            // Handle errors
+            console.error("Error:", error);
+        }
     }
 };
 

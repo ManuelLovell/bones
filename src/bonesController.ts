@@ -11,7 +11,7 @@ import './dice/dicenotify.css'
 //<div id="frontColorisContainer" class='coloris-container full'></div>
 Constants.BONESENTRY.innerHTML =
     `    
-    <div class="header"><span style="float:left;" id="optionsToggle">▼</span>Dice Options</div><div id="whatsNew"></div>
+    <div class="header"><span style="float:left;" id="optionsToggle">▼</span>Dice Options</div><div id="patreonContainer"></div>
     <div id="optionsContainer">
         <div style="display:flex; justify-content:space-between;">
             <div id="selectContainer" class="select"></div>
@@ -39,8 +39,8 @@ OBR.onReady(async () =>
     CreateZoomSelect();
     CreateManualRollArea();
 
-    const whatsNewContainer = document.getElementById("whatsNew")!;
-    whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
+    const patreonContainer = document.getElementById("patreonContainer")!;
+    patreonContainer.appendChild(Utilities.GetPatreonButton());
 
     CreateCollapser("optionsToggle", "optionsContainer", 50, "block");
     CreateCollapser("rollToggle", "rollContainer", 160, "block");

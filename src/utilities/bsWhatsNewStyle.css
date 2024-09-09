@@ -55,17 +55,20 @@
     border-radius: 6px;
 }
 
-#bs-whatsnew {
-    background-color: var(--OBR-dark-blue-trans);
-    backdrop-filter: blur(10px);
-    text-size-adjust: none;
-    margin: 0;
-    padding: 15px;
-    display: flex;
-    height: 90%;
-    flex-direction: column;
-    overflow-x: hidden;
-    margin-bottom: 20px;
+#patreonContainer
+{
+    border: 1px solid var(--foreground-color);
+    border-radius: 6px;
+}
+
+.patreon-clickable {
+    filter: var(--invert);
+    background-color: transparent !important;
+    border-style: none !important;
+    height: 20px;
+    width: 20px;
+    padding: 0 2px 4px;
+    vertical-align: middle;
 }
 
 #footButtonContainer {

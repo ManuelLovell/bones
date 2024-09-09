@@ -9,7 +9,6 @@ export default {
         dicecontroller: path.resolve(__dirname, 'dicecontroller.html'),
         dicewindow: path.resolve(__dirname, 'dicewindow.html'),
         dicenotify: path.resolve(__dirname, 'dicenotify.html'),
-        whatsnew: path.resolve(__dirname, 'bswhatsnew.html')
       }
     }
   }

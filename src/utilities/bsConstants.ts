@@ -4,7 +4,6 @@ export class Constants
     static EXTENSIONID = "com.battle-system.bones";
     static EXTENSIONDICEWINDOWID = "com.battle-system.bones-dicewindow";
     static EXTENSIONDICECONTROLLERID = "com.battle-system.bones-dicecontroller";
-    static EXTENSIONWHATSNEW = "com.battle-system.bones-whatsnew";
     static EXTENSIONNOTIFY = "com.battle-system.bones-notify";
     static DISCORDID = "com.battle-system.discord";
 
@@ -29,7 +28,10 @@ export class Constants
     static BONESWINDOW = document.querySelector<HTMLDivElement>('#bones-window-body-app') as HTMLDivElement;
     static BONESDICECONTROLLER = document.querySelector<HTMLDivElement>('#bones-controller-dice') as HTMLDivElement;
     static BONESNOTIFICATIONS = document.querySelector<HTMLDivElement>('#bones-notify-body-app') as HTMLDivElement;
-
+    
+    static CHECKREGISTRATION = 'https://vrwtdtmnbyhaehtitrlb.supabase.co/functions/v1/patreon-check';
+    static ANONAUTH = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+    
     static DEFAULTTEXTURES = [
         "default",
         "diceOfRolling",
