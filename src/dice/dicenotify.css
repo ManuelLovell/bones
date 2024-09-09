@@ -111,11 +111,11 @@
 
 #cancelSvg,
 #checkSvg,
-#minusSvg
-{
+#minusSvg {
     width: 20px;
     height: 20px;
 }
+
 .dice-notification .crit-success {
     color: green;
 }
@@ -175,4 +175,80 @@
     border: 3px solid #A82E2D;
     border-radius: 50%;
     top: 9px;
+}
+
+.genesysResults{
+    display: contents;
+}
+
+.genesysResults .symbol {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+}
+
+.genesysResults .die-boost {
+    color: #1396AB;
+}
+
+.genesysResults .die-setback {
+    color: #000;
+}
+
+.genesysResults .die-ability {
+    color: #339730;
+}
+
+.genesysResults .die-difficulty {
+    color: #B921EF;
+}
+
+.genesysResults .die-challenge {
+    color: #971D17;
+}
+
+.genesysResults .die-proficiency {
+    color: #DAA42A;
+}
+
+.genesysResults .die-blank {
+    font-size: 3rem;
+    line-height: 100%;
+    padding: 8px 0 0;
+}
+
+/* Tooltip container */
+.genesysResults .tooltip {
+    position: relative;
+}
+
+.genesysResults .tooltiptext {
+    visibility: hidden;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 110%;
+    left: 50%;
+    font-size: 1.5rem;
+    line-height: 100%;
+    transform: translateX(-50%)
+}
+
+.genesysResults .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }

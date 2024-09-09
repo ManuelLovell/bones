@@ -3,7 +3,7 @@ import DiceParser from "@3d-dice/dice-parser-interface";
 import { Constants } from './utilities/bsConstants';
 import OBR from '@owlbear-rodeo/sdk';
 import './dice/dicewindow.css'
-import { GetResults } from './dice/bsDiceResults';
+import { GetGenesysResults, GetGenesysResultsSimple, GetResults, parseGenesysRoll } from './dice/bsDiceResults';
 
 OBR.onReady(async () =>
 {
@@ -35,10 +35,10 @@ OBR.onReady(async () =>
 
     const DRP = new DiceParser();
     const Dice = new DiceBox(
-        "#bones-window-body-app", // target DOM element to inject the canvas for rendering
         {
             id: "dice-canvas", // canvas element id
             assetPath: "/assets/dice-box/",
+            container: "#bones-window-body-app", // target DOM element to inject the canvas for rendering
             startingHeight: 8,
             throwForce: 10,
             spinForce: 5,
@@ -62,10 +62,21 @@ OBR.onReady(async () =>
         }
 
         // if no rerolls needed then parse the final results
-        const finalResults = DRP.parseFinalResults(results);
+        let finalResultsValue = "";
+        let htmlResults = "";
 
-        /// Use modified Result Parser to just get HTML back for Notifier
-        const htmlResults = GetResults(finalResults);
+        if (diceTexture === "genesys")
+        {
+            htmlResults = GetGenesysResults(results);
+            finalResultsValue = GetGenesysResultsSimple(results);
+        }
+        else
+        {
+            const finalResults = DRP.parseFinalResults(results);
+            /// Use modified Result Parser to just get HTML back for Notifier
+            htmlResults = GetResults(finalResults);
+            finalResultsValue = finalResults.value;
+        }
 
         const now = new Date().toISOString();
         const bonesLogged: IBonesLog = {
@@ -78,7 +89,7 @@ OBR.onReady(async () =>
         };
         await OBR.player.setMetadata({ [`${Constants.EXTENSIONID}/metadata_logroll`]: bonesLogged });
 
-        const finalMessage = `You rolled a ${finalResults.value}!`;
+        const finalMessage = `You rolled a ${finalResultsValue}!`;
         await OBR.notification.show(finalMessage, "DEFAULT");
         clearTimeout(AUTOTIMER);
 
@@ -104,26 +115,28 @@ OBR.onReady(async () =>
             customColor = messageContainer.senderColor ?? defaultColor;
             customId = messageContainer.senderId ?? defaultId;
 
+            let rollnotation;
             try
             {
+                if (diceTexture === "genesys")
+                {
+                    rollnotation = parseGenesysRoll(messageContainer.notation);
+                }
+                else
+                {
+                    rollnotation = DRP.parseNotation(messageContainer.notation);
+                }
                 Dice.hide().clear();
-                Dice.show().roll(DRP.parseNotation(messageContainer.notation));
+                Dice.show().roll(rollnotation);
 
                 SetAutoTimeout();
 
             } catch (error)
             {
-                try
-                {
-                    // Safety check in case the texture/color is causing loading issues
-                    Dice.show().roll(DRP.parseNotation(messageContainer.notation), { theme: "default", themeColor: "#ff0000" });
-                    SetAutoTimeout();
-                } catch (error)
-                {
-                    // If we can't parse the formula, just leave so it doesnt block the screen.
-                    await OBR.notification.show("Unable to Parse Dice Notation", "ERROR");
-                    await OBR.modal.close(Constants.EXTENSIONDICEWINDOWID);
-                }
+                // If we can't parse the formula, just leave so it doesnt block the screen.
+                await OBR.notification.show("Unable to Parse Dice Notation", "ERROR");
+                await OBR.modal.close(Constants.EXTENSIONDICEWINDOWID);
+
             }
         });
 

@@ -2,6 +2,46 @@ import OBR, { Metadata } from '@owlbear-rodeo/sdk';
 import { Constants } from './utilities/bsConstants';
 import './dice/dicecontroller.css'
 
+const defaultImageMappings = {
+    'd4': '/dice-four.svg',
+    'd6': '/dice-six.svg',
+    'd8': '/dice-eight.svg',
+    'd10': '/dice-ten.svg',
+    'd12': '/dice-twelve.svg',
+    'd20': '/dice-twenty.svg',
+    'd100': '/dice-hundred.svg'
+};
+
+const defaultTextMappings = {
+    'd4': 'Add a Four-Sided Dice',
+    'd6': 'Add a Six-Sided Dice',
+    'd8': 'Add an Eight-Sided Dice',
+    'd10': 'Add a Ten-Sided Dice',
+    'd12': 'Add a Twelve-Sided Dice',
+    'd20': 'Add a Twenty-Sided Dice',
+    'd100': 'Add a Hundred-Sided Dice'
+};
+
+// Genesys mappings for images and text
+const genesysImageMappings = {
+    'd4': '/gen-boost.svg',
+    'd6': '/gen-setback.svg',
+    'd8': '/gen-ability.svg',
+    'd10': '/gen-difficulty.svg',
+    'd12': '/gen-challenge.svg',
+    'd20': '/blank.svg',
+    'd100': '/gen-proficiency.svg'
+};
+
+const genesysTextMappings = {
+    'd4': 'Add a Boost die',
+    'd6': 'Add a Setback die',
+    'd8': 'Add an Ability die',
+    'd10': 'Add a Difficulty die',
+    'd12': 'Add a Challenge die',
+    'd20': "",
+    'd100': 'Add a Proficiency die'
+};
 // Setup OBR functions
 OBR.onReady(async () =>
 {
@@ -10,6 +50,65 @@ OBR.onReady(async () =>
     const diceGoImg = '/go.svg';
     const userName = await OBR.player.getName();
     const userId = await OBR.player.getId();
+    const roomMeta = await OBR.room.getMetadata();
+    let diceTexture = roomMeta[Constants.DICETEXTURESETTING + userId] as string ?? "default";
+
+    function getMappings()
+    {
+        if (diceTexture === "genesys")
+        {
+            return {
+                imageMappings: genesysImageMappings,
+                textMappings: genesysTextMappings
+            };
+        }
+        return {
+            imageMappings: defaultImageMappings,
+            textMappings: defaultTextMappings
+        };
+    }
+    // Function to get button image
+    function GetButtonImage(diceType)
+    {
+        const { imageMappings } = getMappings();
+        return imageMappings[diceType] || 'default-image.svg'; // Provide a default image if needed
+    }
+
+    // Function to get button text
+    function GetButtonText(diceType)
+    {
+        const { textMappings } = getMappings();
+        return textMappings[diceType] || 'Unknown Dice Type'; // Provide a default text if needed
+    }
+
+    // Update the buttons if the theme/texture changes
+    OBR.room.onMetadataChange((metdata) =>
+    {
+        const newTexture = metdata[Constants.DICETEXTURESETTING + userId] as string ?? "default";
+        if ((diceTexture === "genesys" && newTexture !== "genesys")
+            || diceTexture !== "genesys" && newTexture === "genesys")
+        {
+            diceTexture = newTexture; // Swap the old for checks
+            ReplaceButtonText('d4Button', GetButtonImage('d4'), GetButtonText('d4'));
+            ReplaceButtonText('d6Button', GetButtonImage('d6'), GetButtonText('d6'));
+            ReplaceButtonText('d8Button', GetButtonImage('d8'), GetButtonText('d8'));
+            ReplaceButtonText('d10Button', GetButtonImage('d10'), GetButtonText('d10'));
+            ReplaceButtonText('d12Button', GetButtonImage('d12'), GetButtonText('d12'));
+            ReplaceButtonText('d20Button', GetButtonImage('d20'), GetButtonText('d20'));
+            ReplaceButtonText('d100Button', GetButtonImage('d100'), GetButtonText('d100'));
+
+            const d20Button = document.getElementById('d20Button') as HTMLInputElement;
+            d20Button.disabled = newTexture === "genesys";
+            ResetDiceCounters();
+
+            function ReplaceButtonText(id: string, image: string, text: string)
+            {
+                const button = document.getElementById(id) as HTMLInputElement;
+                button.src = image;
+                button.title = text;
+            }
+        }
+    });
 
     await OBR.popover.open({
         id: Constants.EXTENSIONDICECONTROLLERID,
@@ -38,6 +137,7 @@ OBR.onReady(async () =>
         button.value = '0';
         button.title = tooltip;
         button.src = imageSrc;
+        if (diceTexture === "genesys" && id === "d20Button") button.disabled = true;
         button.classList.add("dice-button");
         button.onclick = (e) =>
         {
@@ -183,13 +283,13 @@ OBR.onReady(async () =>
     optionsContainer.appendChild(gmButton);
     optionsContainer.appendChild(selfButton);
 
-    const dFourButton = createDiceButton('d4Button', '/dice-four.svg', "Add a Four-Sided Dice");
-    const dSixButton = createDiceButton('d6Button', '/dice-six.svg', "Add a Six-Sided Dice");
-    const dEightButton = createDiceButton('d8Button', '/dice-eight.svg', "Add a Eight-Sided Dice");
-    const dTenButton = createDiceButton('d10Button', '/dice-ten.svg', "Add a Ten-Sided Dice");
-    const dTwelveButton = createDiceButton('d12Button', '/dice-twelve.svg', "Add a Twelve-Sided Dice");
-    const dTwentyButton = createDiceButton('d20Button', '/dice-twenty.svg', "Add a Twenty-Sided Dice");
-    const dHundredButton = createDiceButton('d100Button', '/dice-hundred.svg', "Add a Percentile and Ten-Sided Dice");
+    const dFourButton = createDiceButton('d4Button', GetButtonImage('d4'), GetButtonText('d4'));
+    const dSixButton = createDiceButton('d6Button', GetButtonImage('d6'), GetButtonText('d6'));
+    const dEightButton = createDiceButton('d8Button', GetButtonImage('d8'), GetButtonText('d8'));
+    const dTenButton = createDiceButton('d10Button', GetButtonImage('d10'), GetButtonText('d10'));
+    const dTwelveButton = createDiceButton('d12Button', GetButtonImage('d12'), GetButtonText('d12'));
+    const dTwentyButton = createDiceButton('d20Button', GetButtonImage('d20'), GetButtonText('d20'));
+    const dHundredButton = createDiceButton('d100Button', GetButtonImage('d100'), GetButtonText('d100'));
 
     const sceneReady = await OBR.scene.isReady();
 
@@ -210,7 +310,30 @@ OBR.onReady(async () =>
 
         if (rolls.length !== 0)
         {
-            const rollEquation = rolls.join('+');
+            let rollEquation = rolls.join('+');
+            if (diceTexture === "genesys")
+            {
+                const replacements = new Map([
+                    ['d100', 'proficiency'],
+                    ['d12', 'challenge'],
+                    ['d10', 'difficulty'],
+                    ['d8', 'ability'],
+                    ['d6', 'setback'],
+                    ['d4', 'boost']
+                ]);
+
+                function replaceRollEquation(rollEquation: string): string
+                {
+                    let result = rollEquation;
+                    for (const [key, value] of replacements)
+                    {
+                        result = result.replace(new RegExp(key, 'g'), value);
+                    }
+                    return result;
+                }
+                rollEquation = replaceRollEquation(rollEquation);
+            }
+
             const selfview = selfButton.dataset.active;
             const gmview = gmButton.dataset.active;
 

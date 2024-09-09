@@ -38,7 +38,8 @@ export class Constants
         "rock",
         "rust",
         "smooth",
-        "wooden"
+        "wooden",
+        "genesys"
     ];
 }
 

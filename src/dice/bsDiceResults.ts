@@ -1,3 +1,5 @@
+import icons from "./genesys.svg";
+
 export function GetResults(data: ResultsData): string
 {
     let rolls: any[] = [];
@@ -142,4 +144,181 @@ function recursiveSearch(obj: Record<string, any>, searchKey: string, results: a
         }
     });
     return r;
+}
+
+export function GetGenesysResultsSimple(data: ResultsData)
+{
+    let rolls: any[] = [];
+    rolls = Object.values(recursiveSearch(data, 'rolls')).map(group =>
+    {
+        return Object.values(group);
+    }).flat()
+
+    let total = data.hasOwnProperty('value') ? data.value : rolls.reduce((val, roll) => val + roll.value, 0)
+    total = isNaN(total) ? '...' : total;
+
+    if (typeof total === 'string')
+    {
+        total = {};
+
+        // count up values
+        function logValue(value)
+        {
+            if (value && typeof value === 'string')
+            {
+                if (total[value])
+                {
+                    total[value] = total[value] + 1;
+                } else
+                {
+                    total[value] = 1;
+                }
+            }
+        }
+
+        rolls.forEach(roll =>
+        {
+            // if value is a string
+            if (typeof roll.value === 'string')
+            {
+                logValue(roll.value);
+            }
+
+            // if value is an array, then loop and count
+            if (Array.isArray(roll.value))
+            {
+                roll.value.forEach(val =>
+                {
+                    logValue(val);
+                })
+            }
+        })
+    }
+
+    return formatRollResults(total);
+
+    function formatRollResults(rollResults)
+    {
+        const resultArray: string[] = [];
+
+        for (let key in rollResults)
+        {
+            const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+            resultArray.push(`${capitalizedKey}(${rollResults[key]})`);
+        }
+
+        return resultArray.length > 0 ? resultArray.join(', ') : "blank";
+    }
+}
+
+export function GetGenesysResults(data: ResultsData)
+{
+    let rolls: any[] = [];
+    rolls = Object.values(recursiveSearch(data, 'rolls')).map(group =>
+    {
+        return Object.values(group);
+    }).flat()
+
+    let total = data.hasOwnProperty('value') ? data.value : rolls.reduce((val, roll) => val + roll.value, 0)
+    total = isNaN(total) ? '...' : total;
+
+    let resultString = '<div class="values genesysResults">';
+    let totals;
+
+    if (typeof total === 'string')
+    {
+        total = {}
+
+        // count up values
+        function logValue(value, dieType)
+        {
+            if (value && typeof value === 'string')
+            {
+                if (total[value])
+                {
+                    total[value] = total[value] + 1
+                } else
+                {
+                    total[value] = 1
+                }
+                const icon = `<svg class="symbol"><use xlink:href="${icons}#${value}" /></svg>`
+                resultString += `<span class='die-${dieType}'>${icon}</span>`
+            }
+        }
+
+        rolls.forEach(roll =>
+        {
+            const dieType = roll.sides;
+            // if value is a string
+            if (typeof roll.value === 'string')
+            {
+                logValue(roll.value, dieType);
+            }
+
+            // if value is an array, then loop and count
+            if (Array.isArray(roll.value))
+            {
+                roll.value.forEach(val =>
+                {
+                    logValue(val, dieType);
+                })
+            }
+        })
+
+        // sort the keys by alpha
+        const sortedTotals = Object.fromEntries(Object.entries(total).sort())
+
+        totals = Object.entries(sortedTotals).map(([key, val]) =>
+        {
+            const icon = `<svg class="symbol"><use xlink:href="${icons}#${key}" /></svg>`
+            return `<span><span class="tooltip">${icon}<span class="tooltiptext">${key}</span></span><span class="total">:${val}</span></span>`
+        })
+        // square options ■ ⬛
+        if (!totals.length)
+        {
+            totals.push(`<span><span class="tooltip die-blank">⬛<span class="tooltiptext">blank</span></span></span>`)
+        }
+    }
+
+    resultString += '</div>'
+
+    if (resultString === "<div class='values genesysResults'></div>")
+    {
+        resultString = "<div class='values genesysResults'>blank...</div>"
+    }
+    //const totalResults = document.createRange().createContextualFragment(`<div class="totals">${totals.join('')}</div>`)
+    return resultString;
+}
+
+export function parseGenesysRoll(rollString)
+{
+    const diceTypes = {
+        'boost': 'boost',
+        'setback': 'setback',
+        'ability': 'ability',
+        'difficulty': 'difficulty',
+        'challenge': 'challenge',
+        'proficiency': 'proficiency',
+    };
+
+    const diceRolls: any[] = [];
+    const parts = rollString.toLowerCase().match(/(\d+)([a-z]+)/g);
+
+    if (parts)
+    {
+        parts.forEach(part =>
+        {
+            const [, qty, diceType] = part.match(/(\d+)([a-z]+)/);
+            if (diceTypes[diceType])
+            {
+                diceRolls.push({
+                    qty: parseInt(qty),
+                    sides: diceTypes[diceType],
+                    mods: []
+                });
+            }
+        });
+    }
+
+    return diceRolls;
 }

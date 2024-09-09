@@ -71,7 +71,7 @@ class BSCache
         this.theme = "DARK";
         this.roomMetadata = {};
 
-        this.playerDiceTexture = "skulls";
+        this.playerDiceTexture = "default";
         this.playerDiceColor = "#ff0000";
         this.playerFrontDiceColor = "#FFFFFF";
         this.playerDiceZoom = 4;

@@ -13,12 +13,11 @@
     "vite": "^5.0.8"
   },
   "dependencies": {
-    "@3d-dice/dice-box": "^1.0.12",
-    "@3d-dice/dice-box-threejs": "^0.0.12",
+    "@3d-dice/dice-box": "^1.1.4",
     "@3d-dice/dice-parser-interface": "^0.2.1",
-    "@3d-dice/dice-ui": "^0.4.3",
+    "@3d-dice/dice-ui": "^0.5.2",
     "@melloware/coloris": "^0.22.0",
     "@owlbear-rodeo/sdk": "^2.1.0",
-    "dice-roller-parser": "^0.1.8"
+    "dice-roller-parser":  "0.2.6"
   }
 }

@@ -287,6 +287,7 @@ OBR.onReady(async () =>
             { text: "Rusty", value: "rust" },
             { text: "Smooth", value: "smooth" },
             { text: "Wood", value: "wooden" },
+            { text: "Genesys", value: "genesys" },
         ];
 
         textures.forEach((texture) =>
