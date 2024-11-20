@@ -280,6 +280,7 @@ OBR.onReady(async () =>
     function CreateMarkerToggle()
     {
         const checkbox = document.getElementById('diceMarkerToggle') as HTMLInputElement;
+        checkbox.checked = BSCACHE.playerMarkers;
         checkbox.onchange = async (event) =>
         {
             const target = event.currentTarget as HTMLInputElement;
