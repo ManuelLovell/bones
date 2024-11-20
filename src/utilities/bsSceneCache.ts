@@ -428,7 +428,7 @@ class BSCache
     {
         const colorCheck = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId];
         const zoomCheck = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId];
-        const markerCheck = this.roomMetadata[Constants.DICEMARKERSETTING + this.playerId];
+        this.playerMarkers = this.roomMetadata[Constants.DICEMARKERSETTING + this.playerId] === true;
         const frontColorCheck = this.roomMetadata[Constants.FRONTDICECOLORSETTING + this.playerId];
         const textureCheck = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId];
 
@@ -444,10 +444,7 @@ class BSCache
         {
             this.playerDiceZoom = zoomCheck as number;
         }
-        if (markerCheck)
-        {
-            this.playerMarkers = markerCheck === true;
-        }
+
         if (textureCheck)
         {
             this.playerDiceTexture = textureCheck as string;
