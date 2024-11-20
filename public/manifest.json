@@ -1,7 +1,7 @@
 {
   "name": "Bones!",
   "description": "A barebones dice roller that allows for hidden rolls and logging rolls.",
-  "version": "1.31",
+  "version": "1.4",
   "author": "Battle-System",
   "manifest_version": 1,
   "icon": "/logo.png",

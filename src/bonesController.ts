@@ -15,7 +15,12 @@ Constants.BONESENTRY.innerHTML =
     <div id="optionsContainer">
         <div style="display:flex; justify-content:space-between;">
             <div id="selectContainer" class="select"></div>
-            
+            <div class="container">
+                <label class="switch" for="diceMarkerToggle">
+                    <input type="checkbox" id="diceMarkerToggle" />
+                    <div class="slider round"></div>
+                </label>
+            </div>
         </div>
         <div style="display:flex; justify-content:space-between;">
             <div id="zoomContainer" class="select"></div>
@@ -36,6 +41,7 @@ OBR.onReady(async () =>
 
     CreateColorSelect();
     CreateTextureSelect();
+    CreateMarkerToggle();
     CreateZoomSelect();
     CreateManualRollArea();
 
@@ -269,6 +275,16 @@ OBR.onReady(async () =>
             await OBR.room.setMetadata({ [Constants.DICEZOOMSETTING + BSCACHE.playerId]: parseInt(target.value) });
         }
         zoomContainer.appendChild(selector);
+    }
+
+    function CreateMarkerToggle()
+    {
+        const checkbox = document.getElementById('diceMarkerToggle') as HTMLInputElement;
+        checkbox.onchange = async (event) =>
+        {
+            const target = event.currentTarget as HTMLInputElement;
+            await OBR.room.setMetadata({ [Constants.DICEMARKERSETTING + BSCACHE.playerId]: target.checked });
+        }
     }
 
     function CreateTextureSelect()

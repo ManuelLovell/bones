@@ -1,8 +1,10 @@
 import icons from "./genesys.svg";
 
-export function GetResults(data: ResultsData): string
+export function GetResults(data: ResultsData): [string, RollValue[]]
 {
     let rolls: any[] = [];
+    let rollPackage: RollValue[] = [];
+
     if (data.rolls && !Array.isArray(data.rolls))
     {
         rolls = Object.values(data.rolls).map((roll) => roll);
@@ -95,6 +97,9 @@ export function GetResults(data: ResultsData): string
         }
 
         resultString += val;
+
+        // Setup Simple Package Results
+        rollPackage.push({ type: sides, value: roll.value });
     });
 
     // Process modifiers
@@ -122,7 +127,7 @@ export function GetResults(data: ResultsData): string
 
     resultString += ` = <strong>${total}</strong>`;
 
-    return resultString;
+    return [resultString, rollPackage];
 }
 
 function recursiveSearch(obj: Record<string, any>, searchKey: string, results: any[] = [], callback?: (obj: Record<string, any>) => void): any[]

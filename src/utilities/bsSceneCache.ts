@@ -1,7 +1,7 @@
-import OBR, { Grid, Item, Metadata, Player, Theme } from "@owlbear-rodeo/sdk";
+import OBR, { buildPath, buildText, Grid, Item, Metadata, Player, Theme } from "@owlbear-rodeo/sdk";
 import * as Utilities from '../utilities/bsUtilities';
 import { MESSAGES } from "./bsMessageTracker";
-import { Constants } from "./bsConstants";
+import { Constants, DiceShapes } from "./bsConstants";
 
 class BSCache
 {
@@ -27,6 +27,7 @@ class BSCache
     playerFrontDiceColor: string;
     playerDiceTexture: string;
     playerDiceZoom: number;
+    playerMarkers: boolean;
 
     party: Player[];
 
@@ -76,6 +77,7 @@ class BSCache
         this.playerDiceColor = "#ff0000";
         this.playerFrontDiceColor = "#FFFFFF";
         this.playerDiceZoom = 4;
+        this.playerMarkers = false;
 
         this.USER_REGISTERED = false;
         this.caches = caches;
@@ -143,6 +145,7 @@ class BSCache
             this.roomMetadata = await OBR.room.getMetadata();
             this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff0000";
             this.playerDiceZoom = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId] as number ?? 4;
+            this.playerMarkers = this.roomMetadata[Constants.DICEMARKERSETTING + this.playerId] === true;
             this.playerFrontDiceColor = this.roomMetadata[Constants.FRONTDICECOLORSETTING + this.playerId] as string ?? "#FFFFFF";
             this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "default";
 
@@ -151,6 +154,115 @@ class BSCache
                 this.playerDiceTexture = "default";
             }
         }
+
+        const diceTokenHandler = OBR.broadcast.onMessage(Constants.DICETOKENBROADCAST, async (data) =>
+        {
+            if (!this.playerMarkers) return;
+
+            const halfGridUnit = this.gridDpi / 2;
+            const rolls = data.data as RollValue[];
+            const tokensToCreate: Item[] = [];
+
+            const width = await OBR.viewport.getWidth();
+            const height = await OBR.viewport.getHeight();
+            const viewportPosition = await OBR.viewport.inverseTransformPoint({
+                x: width / 2,
+                y: height / 2,
+            });
+
+            function GetShape(diceType: number)
+            {
+                switch (diceType)
+                {
+                    case 4:
+                        return DiceShapes.D4Path(0, 0, BSCACHE.gridDpi);
+                    case 6:
+                        return DiceShapes.D6Path(0, 0, BSCACHE.gridDpi);
+                    case 8:
+                        return DiceShapes.D8Path(0, 0, BSCACHE.gridDpi);
+                    case 10:
+                        return DiceShapes.D10Path(0, 0, BSCACHE.gridDpi);
+                    case 12:
+                        return DiceShapes.D12Path(0, 0, BSCACHE.gridDpi);
+                    case 20:
+                        return DiceShapes.D20Path(0, 0, BSCACHE.gridDpi);
+                    case 100:
+                        return DiceShapes.D100Path(0, 0, BSCACHE.gridDpi);
+                    default:
+                        return DiceShapes.D20Path(0, 0, BSCACHE.gridDpi);
+                }
+            }
+
+            let baseZIndex = .0005;
+            let offSetX = 0;
+            let offSetY = 0;
+            const cap = 2;
+            for (const roll of rolls)
+            {
+                const offsetPosition = { x: viewportPosition.x + offSetX, y: viewportPosition.y + offSetY };
+                // Create Border
+                const diceBorder = buildPath()
+                    .position(offsetPosition)
+                    .commands(DiceShapes.DiceRimPath(0, 0, this.gridDpi))
+                    .strokeOpacity(1)
+                    .strokeWidth(6)
+                    .strokeColor(this.playerColor)
+                    .fillOpacity(1)
+                    .fillColor("black")
+                    .layer("PROP")
+                    .zIndex(baseZIndex + .00001)
+                    .build();
+
+                // Create Dice Image
+                const diceImage = buildPath()
+                    .position(offsetPosition)
+                    .commands(GetShape(roll.type))
+                    .attachedTo(diceBorder.id)
+                    .strokeOpacity(1)
+                    .strokeWidth(4)
+                    .strokeColor("#828282")
+                    .disableHit(true)
+                    .layer("PROP")
+                    .zIndex(baseZIndex + .00002)
+                    .build();
+
+                // Create Text
+                const diceText = buildText()
+                    .attachedTo(diceBorder.id)
+                    .strokeColor("white")
+                    .strokeOpacity(1)
+                    .strokeWidth(4)
+                    .fontWeight(600)
+                    .fontSize(72)
+                    .width(BSCACHE.gridDpi)
+                    .height(BSCACHE.gridDpi)
+                    .position({ x: offsetPosition.x - halfGridUnit, y: offsetPosition.y - halfGridUnit })
+                    .textAlign("CENTER")
+                    .textAlignVertical("MIDDLE")
+                    .textType("PLAIN")
+                    .fillColor("white")
+                    .fillOpacity(1)
+                    .plainText(roll.value.toString())
+                    .disableHit(true)
+                    .layer("PROP")
+                    .zIndex(baseZIndex + .00003)
+                    .build();
+
+                tokensToCreate.push(diceBorder);
+                tokensToCreate.push(diceImage);
+                tokensToCreate.push(diceText);
+                baseZIndex += + 1;
+                offSetY += this.gridDpi
+                if (offSetY > (this.gridDpi * cap))
+                {
+                    offSetY = 0;
+                    offSetX += this.gridDpi;
+                }
+            }
+
+            await OBR.scene.items.addItems(tokensToCreate);
+        });
+
         await this.CheckRegistration();
     }
 
@@ -316,8 +428,10 @@ class BSCache
     {
         const colorCheck = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId];
         const zoomCheck = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId];
+        const markerCheck = this.roomMetadata[Constants.DICEMARKERSETTING + this.playerId];
         const frontColorCheck = this.roomMetadata[Constants.FRONTDICECOLORSETTING + this.playerId];
         const textureCheck = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId];
+
         if (colorCheck)
         {
             this.playerDiceColor = colorCheck as string;
@@ -330,6 +444,10 @@ class BSCache
         {
             this.playerDiceZoom = zoomCheck as number;
         }
+        if (markerCheck)
+        {
+            this.playerMarkers = markerCheck === true;
+        }
         if (textureCheck)
         {
             this.playerDiceTexture = textureCheck as string;
@@ -340,7 +458,7 @@ class BSCache
     {
         Utilities.SetThemeMode(theme, document);
     }
-    
+
     public async CheckRegistration()
     {
         try
@@ -385,4 +503,4 @@ class BSCache
 };
 
 // Set the handlers needed for this Extension
-export const BSCACHE = new BSCache([BSCache.PLAYER, BSCache.PARTY, BSCache.ROOMMETA]);
+export const BSCACHE = new BSCache([BSCache.PLAYER, BSCache.PARTY, BSCache.SCENEGRID, BSCache.ROOMMETA]);

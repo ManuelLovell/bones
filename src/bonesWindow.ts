@@ -64,7 +64,6 @@ OBR.onReady(async () =>
         // if no rerolls needed then parse the final results
         let finalResultsValue = "";
         let htmlResults = "";
-
         if (diceTexture === "genesys")
         {
             htmlResults = GetGenesysResults(results);
@@ -72,10 +71,15 @@ OBR.onReady(async () =>
         }
         else
         {
+            let diceResults: RollValue[];
+
             const finalResults = DRP.parseFinalResults(results);
             /// Use modified Result Parser to just get HTML back for Notifier
-            htmlResults = GetResults(finalResults);
+            [htmlResults, diceResults] = GetResults(finalResults);
             finalResultsValue = finalResults.value;
+
+            if (diceResults)
+                await OBR.broadcast.sendMessage(Constants.DICETOKENBROADCAST, diceResults, { destination: "LOCAL" });
         }
 
         const now = new Date().toISOString();

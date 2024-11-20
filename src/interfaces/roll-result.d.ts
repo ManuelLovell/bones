@@ -111,3 +111,9 @@ interface Roll
     reroll?: boolean;
     explode?: boolean;
 }
+
+interface RollValue
+{
+    type: number;
+    value: number;
+}
