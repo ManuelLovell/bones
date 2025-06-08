@@ -1,6 +1,7 @@
 import OBR, { Metadata } from '@owlbear-rodeo/sdk';
 import { Constants } from './utilities/bsConstants';
 import './dice/dicecontroller.css'
+import { InvertColor } from './utilities/bsUtilities';
 
 const defaultImageMappings = {
     'd4': '/dice-four.svg',
@@ -51,7 +52,43 @@ OBR.onReady(async () =>
     const userName = await OBR.player.getName();
     const userId = await OBR.player.getId();
     const roomMeta = await OBR.room.getMetadata();
+
+    let primaryColor = roomMeta[Constants.DICECOLORSETTING + userId] as string ?? "#ff0000";
+    let secondColor = roomMeta[Constants.SECONDDICECOLORSETTING + userId] as string ?? "#000000";
     let diceTexture = roomMeta[Constants.DICETEXTURESETTING + userId] as string ?? "default";
+
+    // Broadcast Channel
+    OBR.broadcast.onMessage(Constants.COLORCHANNEL, (message) =>
+    {
+        const { color, secondaryColor } = message.data as ColorPack;
+        const swapButton = document.querySelector("#swapColorButton") as HTMLInputElement;
+        if (color)
+        {
+            document.querySelectorAll(".label-primary").forEach((element) =>
+            {
+                (element as HTMLElement).style.background = color;
+                (element as HTMLElement).style.color = InvertColor(color);
+            });
+            if (swapButton.dataset.active === Constants.FALSE)
+            {
+                swapButton.style.background = color;
+                swapButton.style.color = InvertColor(color);
+            }
+        }
+        if (secondaryColor)
+        {
+            document.querySelectorAll(".label-secondary").forEach((element) =>
+            {
+                (element as HTMLElement).style.background = secondaryColor;
+                (element as HTMLElement).style.color = InvertColor(secondaryColor);
+            });
+            if (swapButton.dataset.active === Constants.TRUE)
+            {
+                swapButton.style.background = secondaryColor;
+                swapButton.style.color = InvertColor(secondaryColor);
+            }
+        }
+    });
 
     function getMappings()
     {
@@ -108,12 +145,14 @@ OBR.onReady(async () =>
                 button.title = text;
             }
         }
+        swapColor.style.visibility = newTexture === "genesys" ? "hidden" : "visible";
+        swapColor.dataset.active = Constants.FALSE;
     });
 
     await OBR.popover.open({
         id: Constants.EXTENSIONDICECONTROLLERID,
         url: '/dicecontroller.html',
-        height: 350,
+        height: 356,
         width: 0,
         anchorOrigin: {
             horizontal: "RIGHT",
@@ -141,20 +180,25 @@ OBR.onReady(async () =>
         button.classList.add("dice-button");
         button.onclick = (e) =>
         {
-            let diceCount = parseInt(label.innerText);
             e.stopPropagation();
             e.preventDefault();
 
+            const labelElementInUse = swapColor.dataset.active === Constants.TRUE ? labelsecondary : label;
+            const currentColor = swapColor.dataset.active === Constants.TRUE ? secondColor : primaryColor;
+            const colorWithId = id + '_' + currentColor;
+
+            let diceCount = parseInt(labelElementInUse.innerText);
+
             if (diceCount === 0)
             {
-                label.hidden = false;
+                labelElementInUse.hidden = false;
             }
 
             if (diceCount < 20)
             {
                 diceCount++;
-                label.innerText = diceCount.toString();
-                rollDict[id] = diceCount;
+                labelElementInUse.innerText = diceCount.toString();
+                rollDict[colorWithId] = diceCount;
             }
 
             const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
@@ -171,18 +215,23 @@ OBR.onReady(async () =>
         };
         button.oncontextmenu = (e) => 
         {
-            let diceCount = parseInt(label.innerText);
+            const labelElementInUse = swapColor.dataset.active === Constants.TRUE ? labelsecondary : label;
+            const currentColor = swapColor.dataset.active === Constants.TRUE ? secondColor : primaryColor;
+            const colorWithId = id + '_' + currentColor;
+
+            let diceCount = parseInt(labelElementInUse.innerText);
+
             e.stopPropagation();
             e.preventDefault();
             if (diceCount > 0)
             {
                 diceCount--;
-                label.innerText = diceCount.toString();
-                rollDict[id] = diceCount;
+                labelElementInUse.innerText = diceCount.toString();
+                rollDict[colorWithId] = diceCount;
             }
             if (diceCount === 0)
             {
-                label.hidden = true;
+                labelElementInUse.hidden = true;
             }
 
             const ticks: number = Object.values(rollDict).reduce((sum, count) => sum + count, 0);
@@ -203,14 +252,26 @@ OBR.onReady(async () =>
         container.classList.add("label-container");
 
         const label = document.createElement('label');
+        label.style.background = primaryColor;
+        label.style.color = InvertColor(primaryColor);
         label.innerText = "0";
         label.id = id + "Label";
-        label.classList.add("label");
+        label.classList.add("label-primary");
         label.classList.add("dice-counter");
         label.hidden = true;
 
+        const labelsecondary = document.createElement('label');
+        labelsecondary.style.background = secondColor;
+        labelsecondary.style.color = InvertColor(secondColor);
+        labelsecondary.innerText = "0";
+        labelsecondary.id = id + "Label-Secondary";
+        labelsecondary.classList.add("label-secondary");
+        labelsecondary.classList.add("dice-counter");
+        labelsecondary.hidden = true;
+
         container.appendChild(button);
         container.appendChild(label);
+        container.appendChild(labelsecondary);
 
         return container;
     }
@@ -222,7 +283,7 @@ OBR.onReady(async () =>
     selfButton.id = "rollSelfButton";
     selfButton.type = 'button';
     selfButton.classList.add('options-button');
-    selfButton.value = 'Self';
+    selfButton.value = '► ME';
     selfButton.dataset.active = Constants.FALSE;
     selfButton.onclick = () => 
     {
@@ -237,12 +298,27 @@ OBR.onReady(async () =>
             selfButton.classList.add('options-active');
         }
     };
+    const swapColor = document.createElement('input');
+    swapColor.id = "swapColorButton";
+    swapColor.type = 'button';
+    swapColor.classList.add('options-button');
+    swapColor.value = 'SWAP';
+    swapColor.dataset.active = Constants.FALSE;
+    swapColor.style.background = swapColor.dataset.active === Constants.TRUE ? secondColor : primaryColor;
+    swapColor.style.color = swapColor.dataset.active === Constants.TRUE ? InvertColor(secondColor) : InvertColor(primaryColor);
+    swapColor.style.visibility = diceTexture === "genesys" ? "hidden" : "visible";
+    swapColor.onclick = () => 
+    {
+        swapColor.style.background = swapColor.dataset.active === Constants.FALSE ? secondColor : primaryColor;
+        swapColor.style.color = swapColor.dataset.active === Constants.TRUE ? InvertColor(secondColor) : InvertColor(primaryColor);
+        swapColor.dataset.active = swapColor.dataset.active === Constants.FALSE ? Constants.TRUE : Constants.FALSE;
+    };
 
     const gmButton = document.createElement('input');
     gmButton.id = "rollGMButton";
     gmButton.type = 'button';
     gmButton.classList.add('options-button');
-    gmButton.value = 'GM';
+    gmButton.value = '► GM';
     gmButton.onclick = () =>
     {
         if (gmButton.dataset.active === Constants.TRUE)
@@ -261,7 +337,7 @@ OBR.onReady(async () =>
     optionsButton.id = "showLogButton";
     optionsButton.type = 'button';
     optionsButton.classList.add('options-button');
-    optionsButton.value = 'Log';
+    optionsButton.value = 'MENU';
     optionsButton.dataset.active = Constants.CLOSE;
     optionsButton.onclick = async () =>
     {
@@ -282,6 +358,7 @@ OBR.onReady(async () =>
     optionsContainer.appendChild(optionsButton);
     optionsContainer.appendChild(gmButton);
     optionsContainer.appendChild(selfButton);
+    optionsContainer.appendChild(swapColor);
 
     const dFourButton = createDiceButton('d4Button', GetButtonImage('d4'), GetButtonText('d4'));
     const dSixButton = createDiceButton('d6Button', GetButtonImage('d6'), GetButtonText('d6'));
@@ -304,8 +381,13 @@ OBR.onReady(async () =>
         const rolls: string[] = [];
         for (const [buttonId, count] of Object.entries(rollDict))
         {
-            const diceType = buttonId.replace('Button', '');
-            rolls.push(`${count}${diceType}`);
+            const diceType = buttonId.split('_')[0].replace('Button', ''); // Get the dice type without color
+            let diceColor = '';
+            if (diceTexture !== "genesys")
+            {
+                diceColor = '_' + buttonId.split('_')[1]; // Add color to be parsed off
+            }
+            rolls.push(`${count}${diceType}${diceColor}`);
         }
 
         if (rolls.length !== 0)

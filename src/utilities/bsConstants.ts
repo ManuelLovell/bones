@@ -17,8 +17,9 @@ export class Constants
     static DICEZOOMSETTING = `${Constants.EXTENSIONID}/zoom_`;
     static DICEMARKERSETTING = `${Constants.EXTENSIONID}/marker_`;
     static DICECOLORSETTING = `${Constants.EXTENSIONID}/color_`;
-    static FRONTDICECOLORSETTING = `${Constants.EXTENSIONID}/fcolor_`;
+    static SECONDDICECOLORSETTING = `${Constants.EXTENSIONID}/scolor_`;
     static DICETEXTURESETTING = `${Constants.EXTENSIONID}/texture_`;
+    static COLORCHANNEL = `${Constants.EXTENSIONID}/colorChannel`;
 
     static NORMALDICE = /^[0-9+d]+$/;
     static DICENOTATION = /(\d+)[dD](\d+)(.*)$/i;

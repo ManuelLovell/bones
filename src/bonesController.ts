@@ -22,9 +22,10 @@ Constants.BONESENTRY.innerHTML =
                 </label>
             </div>
         </div>
-        <div style="display:flex; justify-content:space-between;">
+        <div class='dice-options' style="display:flex; justify-content:space-between;">
             <div id="zoomContainer" class="select"></div>
             <div id="backColorisContainer" class='coloris-container full'></div>
+            <div id="secondColorisContainer" class='coloris-container full'></div>
         </div>
     </div>
     <div class="header"><span style="float:left;" id="rollToggle">▼</span>Dice Log</div>
@@ -179,31 +180,33 @@ OBR.onReady(async () =>
 
         //const frontColorisContainer = document.getElementById('frontColorisContainer')!;
         const backColorisContainer = document.getElementById('backColorisContainer')!;
+        const secondColorisContainer = document.getElementById('secondColorisContainer')!;
 
-        // const fColorInput = document.createElement('input');
-        // fColorInput.type = "text";
-        // fColorInput.classList.add('coloris');
-        // fColorInput.id = "diceColoris";
-        // fColorInput.value = BSCACHE.playerFrontDiceColor;
-        // fColorInput.maxLength = 7;
-        // fColorInput.oninput = async (event: Event) =>
-        // {
-        //     if (!event || !event.target) return;
-        //     const target = event.target as HTMLInputElement;
+        const secondColorInput = document.createElement('input');
+        secondColorInput.type = "text";
+        secondColorInput.classList.add('coloris');
+        secondColorInput.id = "sdiceColoris";
+        secondColorInput.value = BSCACHE.playerSecondDiceColor;
+        secondColorInput.maxLength = 7;
+        secondColorInput.oninput = async (event: Event) =>
+        {
+            if (!event || !event.target) return;
+            const target = event.target as HTMLInputElement;
 
-        //     clearTimeout(debouncer);
+            clearTimeout(debouncer);
 
-        //     // Debounce this input to avoid hitting OBR rate limit
-        //     debouncer = setTimeout(async () =>
-        //     {
-        //         const hexTest = /#[a-f0-9]{6}/
-        //         if (hexTest.test(target.value))
-        //         {
-        //             await OBR.room.setMetadata({ [Constants.FRONTDICECOLORSETTING + BSCACHE.playerId]: target.value });
-        //         }
-        //     }, 400);
+            // Debounce this input to avoid hitting OBR rate limit
+            debouncer = setTimeout(async () =>
+            {
+                const hexTest = /#[a-f0-9]{6}/
+                if (hexTest.test(target.value))
+                {
+                    await OBR.room.setMetadata({ [Constants.SECONDDICECOLORSETTING + BSCACHE.playerId]: target.value });
+                }
+            }, 400);
 
-        // };
+        };
+        secondColorisContainer.appendChild(secondColorInput);
 
         const bColorInput = document.createElement('input');
         bColorInput.type = "text";
@@ -238,6 +241,13 @@ OBR.onReady(async () =>
             closeButton: true,
             themeMode: BSCACHE.theme.mode === "DARK" ? "dark" : "light",
             el: "#diceColoris",
+        });
+        Coloris({
+            alpha: false,
+            theme: 'polaroid',
+            closeButton: true,
+            themeMode: BSCACHE.theme.mode === "DARK" ? "dark" : "light",
+            el: "#sdiceColoris",
         });
     }
 

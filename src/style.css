@@ -141,12 +141,18 @@
     background-color: var(--BS-red) !important;
 }
 
+.dice-options
+{
+    margin-top: 4px;
+}
+
 /* COLORIS */
-#frontColorisContainer,
+#secondColorisContainer,
 #backColorisContainer {
     width: 25%;
     height: 1.5em;
     margin-top: 1px;
+    margin-left: 6px;
 }
 
 .colorisContainer {
@@ -157,6 +163,7 @@
     cursor: pointer;
 }
 
+#sdiceColoris,
 #diceColoris {
     cursor: pointer;
     width: 100%;

@@ -128,7 +128,42 @@ OBR.onReady(async () =>
                 }
                 else
                 {
-                    rollnotation = DRP.parseNotation(messageContainer.notation);
+                    const cleanNotation = cleanDiceNotation(messageContainer.notation);
+                    const parsedNotation = DRP.parseNotation(cleanNotation);
+                    rollnotation = mapDiceColorsToNotation(messageContainer.notation, parsedNotation);
+                    console.log("Pre Roll Notation: ", cleanNotation);
+                    console.log("Parsed Roll Notation: ", rollnotation);
+
+                    function cleanDiceNotation(notation: string): string
+                    {
+                        // Remove all occurrences of _# followed by 6 hex digits
+                        let cleaned = notation.replace(/_[#][0-9a-fA-F]{6}/g, '');
+                        // Remove any remaining underscores
+                        cleaned = cleaned.replace(/_/g, '');
+                        return cleaned;
+                    }
+
+                    function mapDiceColorsToNotation(
+                        originalNotation: string,
+                        parsedNotation: Array<{ qty: number; sides: number; mods: any[] }>
+                    ): Array<{ qty: number; sides: number; mods: any[]; color?: string }>
+                    {
+                        // Split the original notation into dice groups
+                        const diceGroups = originalNotation.split('+');
+                        // Extract hex color for each group
+                        const colorMatches = diceGroups.map(group =>
+                        {
+                            const match = group.match(/_#([0-9a-fA-F]{6})/);
+                            return match ? `#${match[1]}` : undefined;
+                        });
+
+                        // Map colors to parsed notation objects
+                        return parsedNotation.map((die, idx) =>
+                        {
+                            const themeColor = colorMatches[idx];
+                            return themeColor ? { ...die, themeColor } : { ...die };
+                        });
+                    }
                 }
                 Dice.hide().clear();
                 Dice.show().roll(rollnotation);

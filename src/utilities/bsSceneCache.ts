@@ -24,7 +24,7 @@ class BSCache
     playerRole: "GM" | "PLAYER";
 
     playerDiceColor: string;
-    playerFrontDiceColor: string;
+    playerSecondDiceColor: string;
     playerDiceTexture: string;
     playerDiceZoom: number;
     playerMarkers: boolean;
@@ -75,7 +75,7 @@ class BSCache
 
         this.playerDiceTexture = "default";
         this.playerDiceColor = "#ff0000";
-        this.playerFrontDiceColor = "#FFFFFF";
+        this.playerSecondDiceColor = "#FFFFFF";
         this.playerDiceZoom = 4;
         this.playerMarkers = false;
 
@@ -146,7 +146,7 @@ class BSCache
             this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff0000";
             this.playerDiceZoom = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId] as number ?? 4;
             this.playerMarkers = this.roomMetadata[Constants.DICEMARKERSETTING + this.playerId] === true;
-            this.playerFrontDiceColor = this.roomMetadata[Constants.FRONTDICECOLORSETTING + this.playerId] as string ?? "#FFFFFF";
+            this.playerSecondDiceColor = this.roomMetadata[Constants.SECONDDICECOLORSETTING + this.playerId] as string ?? "#FFFFFF";
             this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "default";
 
             if (!Constants.DEFAULTTEXTURES.includes(this.playerDiceTexture))
@@ -429,16 +429,18 @@ class BSCache
         const colorCheck = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId];
         const zoomCheck = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId];
         this.playerMarkers = this.roomMetadata[Constants.DICEMARKERSETTING + this.playerId] === true;
-        const frontColorCheck = this.roomMetadata[Constants.FRONTDICECOLORSETTING + this.playerId];
+        const secondColorCheck = this.roomMetadata[Constants.SECONDDICECOLORSETTING + this.playerId];
         const textureCheck = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId];
 
         if (colorCheck)
         {
             this.playerDiceColor = colorCheck as string;
+            await OBR.broadcast.sendMessage(Constants.COLORCHANNEL, { color: colorCheck }, { destination: "LOCAL" });
         }
-        if (frontColorCheck)
+        if (secondColorCheck)
         {
-            this.playerFrontDiceColor = frontColorCheck as string;
+            this.playerSecondDiceColor = secondColorCheck as string;
+            await OBR.broadcast.sendMessage(Constants.COLORCHANNEL, { secondaryColor: secondColorCheck }, { destination: "LOCAL" });
         }
         if (zoomCheck)
         {
