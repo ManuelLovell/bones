@@ -52,7 +52,7 @@ OBR.onReady(async () =>
         }
     );
 
-    Dice.onRollComplete = async (results) => 
+    Dice.onRollComplete = async (results) => // Results has color per die
     {
         const rerolls = DRP.handleRerolls(results);
         if (rerolls.length)
@@ -73,9 +73,10 @@ OBR.onReady(async () =>
         {
             let diceResults: RollValue[];
 
-            const finalResults = DRP.parseFinalResults(results);
+            const finalResults = DRP.parseFinalResults(results); // Final Results doesnt have color info
+
             /// Use modified Result Parser to just get HTML back for Notifier
-            [htmlResults, diceResults] = GetResults(finalResults);
+            [htmlResults, diceResults] = GetResults(finalResults, results);
             finalResultsValue = finalResults.value;
 
             if (diceResults)

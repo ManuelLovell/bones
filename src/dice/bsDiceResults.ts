@@ -1,6 +1,6 @@
 import icons from "./genesys.svg";
 
-export function GetResults(data: ResultsData): [string, RollValue[]]
+export function GetResults(data: ResultsData, rawResults: any): [string, RollValue[]]
 {
     let rolls: any[] = [];
     let rollPackage: RollValue[] = [];
@@ -29,6 +29,15 @@ export function GetResults(data: ResultsData): [string, RollValue[]]
 
     total = isNaN(total) ? '...' : total;
     let resultString = '';
+
+    // Flatten all individual rolls from rawResults and collect their themeColor
+    const diceColors: string[] = Array.isArray(rawResults)
+        ? rawResults.flatMap(group =>
+            Array.isArray(group.rolls)
+                ? group.rolls.map((roll: any) => roll.themeColor || group.themeColor)
+                : [group.themeColor]
+          )
+        : [];
 
     rolls.forEach((roll, i) =>
     {
@@ -91,9 +100,17 @@ export function GetResults(data: ResultsData): [string, RollValue[]]
             }
         }
 
+        // Use the correct color for each individual roll
+        const color = diceColors[i];
         if (classes !== '')
         {
-            val = `<span class='${classes.trim()}'>${val}</span>`;
+            if (color)
+            {
+                val = `<span class='${classes.trim()}' style="background:${color};">${val}</span>`;
+            } else
+            {
+                val = `<span class='${classes.trim()}'>${val}</span>`;
+            }
         }
 
         resultString += val;
