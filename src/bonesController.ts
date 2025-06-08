@@ -22,7 +22,7 @@ Constants.BONESENTRY.innerHTML =
                 </label>
             </div>
         </div>
-        <div class='dice-options' style="display:flex; justify-content:space-between;">
+        <div id="colorisContainer" class='dice-options' style="display:flex; justify-content:space-between;">
             <div id="zoomContainer" class="select"></div>
             <div id="backColorisContainer" class='coloris-container full'></div>
             <div id="secondColorisContainer" class='coloris-container full'></div>

@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^6.3.5"
   },
   "dependencies": {
     "@3d-dice/dice-box": "^1.1.4",

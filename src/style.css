@@ -141,8 +141,7 @@
     background-color: var(--BS-red) !important;
 }
 
-.dice-options
-{
+.dice-options {
     margin-top: 4px;
 }
 
@@ -155,12 +154,15 @@
     margin-left: 6px;
 }
 
-.colorisContainer {
+.coloris-container {
     width: 100%;
     height: 1.5em;
-    margin-bottom: 5px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+#colorisContainer {
+    position: relative;
 }
 
 #sdiceColoris,
@@ -170,7 +172,6 @@
     height: 1.5em;
     padding: 0 10px;
     border: 1px solid var(--OBR-font);
-    ;
     border-radius: 5px;
     font-family: inherit;
     font-size: inherit;
@@ -184,7 +185,13 @@
     border-radius: 5px;
 }
 
-/* COLORIS */
+/* COLORIS - Needed for positioning*/
+.clr-picker {
+    left: 10px !important;
+}
+.clr-picker.clr-polaroid:before {
+    display: none !important;
+}
 
 /* SELECT */
 select {
