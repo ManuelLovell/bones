@@ -1,4 +1,4 @@
-import{C as b,O as R}from"./bsConstants-BwvBGUaJ.js";import{B as C,G as Te}from"./bsUtilities-R5GN5QU1.js";/* empty css                   */const A=(()=>{/*!
+import{C as b,O as R}from"./bsConstants-D1Gb3Lfo.js";import{B as C,G as Te}from"./bsUtilities-2t2H-Erd.js";/* empty css                   */const A=(()=>{/*!
 * Copyright (c) 2021-2023 Momo Bassit.
 * Licensed under the MIT License (MIT)
 * https://github.com/mdbassit/Coloris
@@ -16,7 +16,7 @@ import{C as b,O as R}from"./bsConstants-BwvBGUaJ.js";import{B as C,G as Te}from"
                 </label>
             </div>
         </div>
-        <div class='dice-options' style="display:flex; justify-content:space-between;">
+        <div id="colorisContainer" class='dice-options' style="display:flex; justify-content:space-between;">
             <div id="zoomContainer" class="select"></div>
             <div id="backColorisContainer" class='coloris-container full'></div>
             <div id="secondColorisContainer" class='coloris-container full'></div>
