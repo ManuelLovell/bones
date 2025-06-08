@@ -64,6 +64,7 @@ OBR.onReady(async () =>
         const swapButton = document.querySelector("#swapColorButton") as HTMLInputElement;
         if (color)
         {
+            primaryColor = color;
             document.querySelectorAll(".label-primary").forEach((element) =>
             {
                 (element as HTMLElement).style.background = color;
@@ -77,6 +78,7 @@ OBR.onReady(async () =>
         }
         if (secondaryColor)
         {
+            secondColor = secondaryColor;
             document.querySelectorAll(".label-secondary").forEach((element) =>
             {
                 (element as HTMLElement).style.background = secondaryColor;
