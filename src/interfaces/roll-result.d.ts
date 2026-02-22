@@ -10,6 +10,7 @@ interface IBonesRoll
 {
     created: string;
     notation: string;
+    actionName?: string;
     senderName?: string,
     senderColor?: string,
     senderId?: string,
@@ -32,6 +33,7 @@ interface IBonesLog
     senderName: string; // Sender Name
     senderId: string; // Sender OBR Id
     senderColor: string; // Sender OBR Color
+    actionName?: string;
     viewers: "SELF" | "ALL" | "GM";
     rollHtml: string; // result of a roll to broadcast
 }

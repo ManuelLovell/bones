@@ -9,6 +9,8 @@ export class Constants
     static EXTENSIONNOTIFY = "com.battle-system.bones-notify";
     static DISCORDID = "com.battle-system.discord";
     static DICETOKENBROADCAST = "bones.dicetoken.broadcast";
+    static BROADCASTLISTENER = "bones.broadcast.listener";
+    static BROADCASTSENDER = "bones.broadcast.sender";
     static OPEN = "OPEN";
     static CLOSE = "CLOSE";
     static TRUE = "TRUE";

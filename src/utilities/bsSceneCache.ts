@@ -3,8 +3,7 @@ import * as Utilities from '../utilities/bsUtilities';
 import { MESSAGES } from "./bsMessageTracker";
 import { Constants, DiceShapes } from "./bsConstants";
 
-class BSCache
-{
+class BSCache {
     // Cache Names
     static PLAYER = "PLAYER";
     static PARTY = "PARTY";
@@ -56,8 +55,7 @@ class BSCache
     themeHandler?: () => void;
     roomHandler?: () => void;
 
-    constructor(caches: string[])
-    {
+    constructor(caches: string[]) {
         this.playerId = "";
         this.playerName = "";
         this.playerColor = "";
@@ -88,15 +86,13 @@ class BSCache
         this.debouncedOnRoomMetadataChange = Utilities.Debounce(this.OnRoomMetadataChange.bind(this) as any, 100);
     }
 
-    public async InitializeCache()
-    {
+    public async InitializeCache() {
         // Always Cache
         this.sceneReady = await OBR.scene.isReady();
         this.theme = await OBR.theme.getTheme();
         Utilities.SetThemeMode(this.theme, document);
 
-        if (this.caches.includes(BSCache.PLAYER))
-        {
+        if (this.caches.includes(BSCache.PLAYER)) {
             this.playerId = await OBR.player.getId();
             this.playerName = await OBR.player.getName();
             this.playerColor = await OBR.player.getColor();
@@ -109,11 +105,9 @@ class BSCache
             if (logData) MESSAGES.IsThisOld(logData.created, logData.senderId, "LOG");
         }
 
-        if (this.caches.includes(BSCache.PARTY))
-        {
+        if (this.caches.includes(BSCache.PARTY)) {
             this.party = await OBR.party.getPlayers();
-            for (const player of this.party)
-            {
+            for (const player of this.party) {
                 const boneData = player.metadata[`${Constants.EXTENSIONID}/metadata_bonesroll`] as IBonesRoll;
                 if (boneData) MESSAGES.IsThisOld(boneData.created, boneData.senderName!, "DEFAULT");
                 const logData = player.metadata[`${Constants.EXTENSIONID}/metadata_logroll`] as IBonesLog;
@@ -121,27 +115,22 @@ class BSCache
             }
         }
 
-        if (this.caches.includes(BSCache.SCENEITEMS))
-        {
+        if (this.caches.includes(BSCache.SCENEITEMS)) {
             if (this.sceneReady) this.sceneItems = await OBR.scene.items.getItems();
         }
 
-        if (this.caches.includes(BSCache.SCENEMETA))
-        {
+        if (this.caches.includes(BSCache.SCENEMETA)) {
             if (this.sceneReady) this.sceneMetadata = await OBR.scene.getMetadata();
         }
 
-        if (this.caches.includes(BSCache.SCENEGRID))
-        {
-            if (this.sceneReady)
-            {
+        if (this.caches.includes(BSCache.SCENEGRID)) {
+            if (this.sceneReady) {
                 this.gridDpi = await OBR.scene.grid.getDpi();
                 this.gridScale = (await OBR.scene.grid.getScale()).parsed?.multiplier ?? 5;
             }
         }
 
-        if (this.caches.includes(BSCache.ROOMMETA))
-        {
+        if (this.caches.includes(BSCache.ROOMMETA)) {
             this.roomMetadata = await OBR.room.getMetadata();
             this.playerDiceColor = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId] as string ?? "#ff0000";
             this.playerDiceZoom = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId] as number ?? 4;
@@ -149,14 +138,31 @@ class BSCache
             this.playerSecondDiceColor = this.roomMetadata[Constants.SECONDDICECOLORSETTING + this.playerId] as string ?? "#FFFFFF";
             this.playerDiceTexture = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId] as string ?? "default";
 
-            if (!Constants.DEFAULTTEXTURES.includes(this.playerDiceTexture))
-            {
+            if (!Constants.DEFAULTTEXTURES.includes(this.playerDiceTexture)) {
                 this.playerDiceTexture = "default";
             }
         }
 
-        const diceTokenHandler = OBR.broadcast.onMessage(Constants.DICETOKENBROADCAST, async (data) =>
-        {
+        const diceBroadcastListener = OBR.broadcast.onMessage(Constants.BROADCASTLISTENER, async (data) => {
+            const rollData = data.data as any;
+
+            await OBR.player.setMetadata({ [`${Constants.EXTENSIONID}/broadcast_roll`]: rollData });
+
+            const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
+            const VIEWPORTWIDTH = await OBR.viewport.getWidth();
+
+            await OBR.modal.open({
+                id: Constants.EXTENSIONDICEWINDOWID,
+                url: '/dicewindow.html?broadcast=true',
+                height: VIEWPORTHEIGHT - 100,
+                width: VIEWPORTWIDTH - 50,
+                hidePaper: true,
+                hideBackdrop: true,
+                disablePointerEvents: true,
+            });
+        });
+
+        const diceTokenHandler = OBR.broadcast.onMessage(Constants.DICETOKENBROADCAST, async (data) => {
             if (!this.playerMarkers) return;
 
             const halfGridUnit = this.gridDpi / 2;
@@ -170,10 +176,8 @@ class BSCache
                 y: height / 2,
             });
 
-            function GetShape(diceType: number)
-            {
-                switch (diceType)
-                {
+            function GetShape(diceType: number) {
+                switch (diceType) {
                     case 4:
                         return DiceShapes.D4Path(0, 0, BSCACHE.gridDpi);
                     case 6:
@@ -197,8 +201,7 @@ class BSCache
             let offSetX = 0;
             let offSetY = 0;
             const cap = 2;
-            for (const roll of rolls)
-            {
+            for (const roll of rolls) {
                 const offsetPosition = { x: viewportPosition.x + offSetX, y: viewportPosition.y + offSetY };
                 // Create Border
                 const diceBorder = buildPath()
@@ -253,8 +256,7 @@ class BSCache
                 tokensToCreate.push(diceText);
                 baseZIndex += + 1;
                 offSetY += this.gridDpi
-                if (offSetY > (this.gridDpi * cap))
-                {
+                if (offSetY > (this.gridDpi * cap)) {
                     offSetY = 0;
                     offSetX += this.gridDpi;
                 }
@@ -266,8 +268,7 @@ class BSCache
         await this.CheckRegistration();
     }
 
-    public KillHandlers()
-    {
+    public KillHandlers() {
         if (this.caches.includes(BSCache.SCENEMETA) && this.sceneMetadataHandler !== undefined) this.sceneMetadataHandler!();
         if (this.caches.includes(BSCache.SCENEITEMS) && this.sceneItemsHandler !== undefined) this.sceneItemsHandler!();
         if (this.caches.includes(BSCache.SCENEGRID) && this.sceneGridHandler !== undefined) this.sceneGridHandler!();
@@ -278,39 +279,29 @@ class BSCache
         if (this.themeHandler !== undefined) this.themeHandler!();
     }
 
-    public SetupHandlers()
-    {
+    public SetupHandlers() {
 
-        if (this.sceneMetadataHandler === undefined || this.sceneMetadataHandler.length === 0)
-        {
-            if (this.caches.includes(BSCache.SCENEMETA))
-            {
-                this.sceneMetadataHandler = OBR.scene.onMetadataChange(async (metadata) =>
-                {
+        if (this.sceneMetadataHandler === undefined || this.sceneMetadataHandler.length === 0) {
+            if (this.caches.includes(BSCache.SCENEMETA)) {
+                this.sceneMetadataHandler = OBR.scene.onMetadataChange(async (metadata) => {
                     this.sceneMetadata = metadata;
                     this.debouncedOnSceneMetadataChange(metadata);
                 });
             }
         }
 
-        if (this.sceneItemsHandler === undefined || this.sceneItemsHandler.length === 0)
-        {
-            if (this.caches.includes(BSCache.SCENEITEMS))
-            {
-                this.sceneItemsHandler = OBR.scene.items.onChange(async (items) =>
-                {
+        if (this.sceneItemsHandler === undefined || this.sceneItemsHandler.length === 0) {
+            if (this.caches.includes(BSCache.SCENEITEMS)) {
+                this.sceneItemsHandler = OBR.scene.items.onChange(async (items) => {
                     this.sceneItems = items;
                     this.debouncedOnSceneItemsChange(items);
                 });
             }
         }
 
-        if (this.sceneGridHandler === undefined || this.sceneGridHandler.length === 0)
-        {
-            if (this.caches.includes(BSCache.SCENEGRID))
-            {
-                this.sceneGridHandler = OBR.scene.grid.onChange(async (grid) =>
-                {
+        if (this.sceneGridHandler === undefined || this.sceneGridHandler.length === 0) {
+            if (this.caches.includes(BSCache.SCENEGRID)) {
+                this.sceneGridHandler = OBR.scene.grid.onChange(async (grid) => {
                     this.gridDpi = grid.dpi;
                     this.gridScale = parseInt(grid.scale);
                     await this.OnSceneGridChange(grid);
@@ -318,12 +309,9 @@ class BSCache
             }
         }
 
-        if (this.playerHandler === undefined || this.playerHandler.length === 0)
-        {
-            if (this.caches.includes(BSCache.PLAYER))
-            {
-                this.playerHandler = OBR.player.onChange(async (player) =>
-                {
+        if (this.playerHandler === undefined || this.playerHandler.length === 0) {
+            if (this.caches.includes(BSCache.PLAYER)) {
+                this.playerHandler = OBR.player.onChange(async (player) => {
                     this.playerName = player.name;
                     this.playerColor = player.color;
                     this.playerId = player.id;
@@ -334,24 +322,18 @@ class BSCache
             }
         }
 
-        if (this.partyHandler === undefined || this.partyHandler.length === 0)
-        {
-            if (this.caches.includes(BSCache.PARTY))
-            {
-                this.partyHandler = OBR.party.onChange(async (party) =>
-                {
+        if (this.partyHandler === undefined || this.partyHandler.length === 0) {
+            if (this.caches.includes(BSCache.PARTY)) {
+                this.partyHandler = OBR.party.onChange(async (party) => {
                     this.party = party;
                     await this.OnPartyChange(party);
                 });
             }
         }
 
-        if (this.roomHandler === undefined || this.roomHandler.length === 0)
-        {
-            if (this.caches.includes(BSCache.ROOMMETA))
-            {
-                this.roomHandler = OBR.room.onMetadataChange(async (metadata) =>
-                {
+        if (this.roomHandler === undefined || this.roomHandler.length === 0) {
+            if (this.caches.includes(BSCache.ROOMMETA)) {
+                this.roomHandler = OBR.room.onMetadataChange(async (metadata) => {
                     this.roomMetadata = metadata;
                     this.debouncedOnRoomMetadataChange();
                 });
@@ -359,24 +341,19 @@ class BSCache
         }
 
 
-        if (this.themeHandler === undefined)
-        {
-            this.themeHandler = OBR.theme.onChange(async (theme) =>
-            {
+        if (this.themeHandler === undefined) {
+            this.themeHandler = OBR.theme.onChange(async (theme) => {
                 this.theme = theme.mode;
                 await this.OnThemeChange(theme);
             });
         }
 
         // Only setup if we don't have one, never kill
-        if (this.sceneReadyHandler === undefined)
-        {
-            this.sceneReadyHandler = OBR.scene.onReadyChange(async (ready) =>
-            {
+        if (this.sceneReadyHandler === undefined) {
+            this.sceneReadyHandler = OBR.scene.onReadyChange(async (ready) => {
                 this.sceneReady = ready;
 
-                if (ready)
-                {
+                if (ready) {
                     this.sceneItems = await OBR.scene.items.getItems();
                     this.sceneMetadata = await OBR.scene.getMetadata();
                     this.gridDpi = await OBR.scene.grid.getDpi();
@@ -387,81 +364,64 @@ class BSCache
         }
     }
 
-    public async OnSceneMetadataChanges(_metadata: Metadata)
-    {
+    public async OnSceneMetadataChanges(_metadata: Metadata) {
     }
 
-    public async OnSceneItemsChange(_items: Item[])
-    {
-        if (this.sceneReady)
-        {
+    public async OnSceneItemsChange(_items: Item[]) {
+        if (this.sceneReady) {
         }
     }
 
-    public async OnSceneGridChange(_grid: Grid)
-    {
+    public async OnSceneGridChange(_grid: Grid) {
 
     }
 
-    public async OnSceneReadyChange(ready: boolean)
-    {
-        if (ready)
-        {
+    public async OnSceneReadyChange(ready: boolean) {
+        if (ready) {
         }
     }
 
-    public async OnPlayerChange(player: Player)
-    {
+    public async OnPlayerChange(player: Player) {
         await MESSAGES.ShowBonesRoll(player.metadata);
         await MESSAGES.LogBonesRoll(player.metadata);
     }
 
-    public async OnPartyChange(party: Player[])
-    {
-        for await (const player of party)
-        {
+    public async OnPartyChange(party: Player[]) {
+        for await (const player of party) {
             await MESSAGES.LogBonesRoll(player.metadata);
         }
     }
 
-    public async OnRoomMetadataChange()
-    {
+    public async OnRoomMetadataChange() {
         const colorCheck = this.roomMetadata[Constants.DICECOLORSETTING + this.playerId];
         const zoomCheck = this.roomMetadata[Constants.DICEZOOMSETTING + this.playerId];
         this.playerMarkers = this.roomMetadata[Constants.DICEMARKERSETTING + this.playerId] === true;
         const secondColorCheck = this.roomMetadata[Constants.SECONDDICECOLORSETTING + this.playerId];
         const textureCheck = this.roomMetadata[Constants.DICETEXTURESETTING + this.playerId];
 
-        if (colorCheck)
-        {
+        if (colorCheck) {
             this.playerDiceColor = colorCheck as string;
             await OBR.broadcast.sendMessage(Constants.COLORCHANNEL, { color: colorCheck }, { destination: "LOCAL" });
         }
-        if (secondColorCheck)
-        {
+        if (secondColorCheck) {
             this.playerSecondDiceColor = secondColorCheck as string;
             await OBR.broadcast.sendMessage(Constants.COLORCHANNEL, { secondaryColor: secondColorCheck }, { destination: "LOCAL" });
         }
-        if (zoomCheck)
-        {
+        if (zoomCheck) {
             this.playerDiceZoom = zoomCheck as number;
         }
 
-        if (textureCheck)
-        {
+        if (textureCheck) {
             this.playerDiceTexture = textureCheck as string;
         }
     }
 
-    public async OnThemeChange(theme: Theme)
-    {
+    public async OnThemeChange(theme: Theme) {
         Utilities.SetThemeMode(theme, document);
     }
 
-    public async CheckRegistration()
-    {
-        try
-        {
+    public async CheckRegistration() {
+        try {
             const debug = window.location.origin.includes("localhost") ? "eternaldream" : "";
             const userid = {
                 owlbearid: BSCACHE.playerId
@@ -478,23 +438,20 @@ class BSCache
             };
             const response = await fetch(Constants.CHECKREGISTRATION, requestOptions);
 
-            if (!response.ok)
-            {
+            if (!response.ok) {
                 const errorData = await response.json();
                 // Handle error data
                 console.error("Error:", errorData);
                 return;
             }
             const data = await response.json();
-            if (data.Data === "OK")
-            {
+            if (data.Data === "OK") {
                 this.USER_REGISTERED = true;
                 console.log("Connected");
             }
             else console.log("Not Registered");
         }
-        catch (error)
-        {
+        catch (error) {
             // Handle errors
             console.error("Error:", error);
         }
