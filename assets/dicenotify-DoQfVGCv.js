@@ -6,4 +6,4 @@ import{O as c,C as e}from"./bsConstants-CfUwLluC.js";/* empty css               
             </div>
             <div id="diceMessage" class="dice-notification">${r}</div>
         </div>
-    `;const n=document.getElementById("notifyHtml");e.BONESNOTIFICATIONS.style.border=`1px solid ${s}`;const o=document.createElement("input");o.type="image",o.classList.add("close-notify-button"),o.src="/close-button.svg",o.onclick=async()=>{await c.popover.close(e.EXTENSIONNOTIFY+i)},e.BONESNOTIFICATIONS.appendChild(o),n.scrollHeight>n.clientHeight&&await c.popover.setHeight(e.EXTENSIONNOTIFY+i,n.scrollHeight),setTimeout(async()=>{await c.popover.close(e.EXTENSIONNOTIFY+i)},3e3)});
+    `;const n=document.getElementById("notifyHtml");e.BONESNOTIFICATIONS.style.border=`1px solid ${s}`;const o=document.createElement("input");o.type="image",o.classList.add("close-notify-button"),o.src="/close-button.svg",o.onclick=async()=>{await c.popover.close(e.EXTENSIONNOTIFY+i)},e.BONESNOTIFICATIONS.appendChild(o),n.scrollHeight>n.clientHeight&&await c.popover.setHeight(e.EXTENSIONNOTIFY+i,n.scrollHeight),setTimeout(async()=>{await c.popover.close(e.EXTENSIONNOTIFY+i)},4e3)});
