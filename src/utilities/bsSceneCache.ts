@@ -163,20 +163,7 @@ class BSCache {
         const diceBroadcastListener = OBR.broadcast.onMessage(Constants.BROADCASTLISTENER, async (data) => {
             const rollData = data.data as any;
 
-            await OBR.player.setMetadata({ [`${Constants.EXTENSIONID}/broadcast_roll`]: rollData });
-
-            const VIEWPORTHEIGHT = await OBR.viewport.getHeight();
-            const VIEWPORTWIDTH = await OBR.viewport.getWidth();
-
-            await OBR.modal.open({
-                id: Constants.EXTENSIONDICEWINDOWID,
-                url: '/dicewindow.html?broadcast=true',
-                height: VIEWPORTHEIGHT - 100,
-                width: VIEWPORTWIDTH - 50,
-                hidePaper: true,
-                hideBackdrop: true,
-                disablePointerEvents: true,
-            });
+            await OBR.player.setMetadata({ [`${Constants.EXTENSIONID}/metadata_bonesroll`]: rollData });
         });
 
         const diceTokenHandler = OBR.broadcast.onMessage(Constants.DICETOKENBROADCAST, async (data) => {

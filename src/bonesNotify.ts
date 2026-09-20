@@ -40,5 +40,5 @@ OBR.onReady(async () =>
     setTimeout(async () =>
     {
         await OBR.popover.close(Constants.EXTENSIONNOTIFY + queuenumber);
-    }, 3000);
+    }, 4000);
 });
