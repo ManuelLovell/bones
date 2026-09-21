@@ -89,9 +89,6 @@ export class MessageTracker
 
                     if (bonesLog.senderId !== BSCACHE.playerId)
                     {
-                        console.log("hit")
-                        console.log('senderId:', bonesLog.senderId);
-                        console.log('playerId:', BSCACHE.playerId);
                         const VIEWHEIGHT = await OBR.viewport.getHeight();
                         const encodedMessage = encodeURIComponent(rollHtml);
                         const encodedSender = encodeURIComponent(bonesLog.senderName);
